@@ -1,12 +1,11 @@
-import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
+import { createUserWithEmailAndPassword } from "firebase/auth";
 import React, { useState } from "react";
+import { auth } from "../secrets/firebase-secrets";
 
 const SignUp = () => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     
-    const auth = getAuth();
-
     const signUp = (e) => {
       e.preventDefault();
       createUserWithEmailAndPassword(auth, email, password)
