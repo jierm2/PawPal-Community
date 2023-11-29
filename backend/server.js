@@ -4,6 +4,7 @@ var mongoose = require("mongoose");
 var { ObjectId } = require("mongoose");
 var mongoSecrets = require("./secrets/mongo-secrets.js");
 var User = require("./models/user.js");
+var Task = require("./models/task.js");
 
 const PORT = 9001;
 
@@ -73,6 +74,93 @@ app.post("/api/users", async (req, res) => {
     // console.log(bob);
 
     res.status(201).send({ message: "OK", data: bob });
+  } catch (err) {
+    res
+      .status(500)
+      .send({ message: "Internal server error", data: err.message });
+  }
+});
+
+app.get("/api/tasks", async (req, res) => {
+  try {
+    var where = req.query.where ? JSON.parse(req.query.where) : {};
+    var sort = req.query.sort;
+    var select = req.query.select ? JSON.parse(req.query.select) : {};
+    var skip = req.query.skip;
+    var limit = req.query.limit;
+    var count = req.query.count === "true";
+
+    var options = {
+      sort: sort ? JSON.parse(sort) : sort,
+      skip: parseInt(skip),
+      limit: parseInt(limit),
+      // count: (count === 'true'),
+    };
+
+    const documents = await Task.find(where, select, options);
+
+    res
+      .status(201)
+      .send({ message: "OK", data: count ? documents.length : documents });
+  } catch (err) {
+    res
+      .status(500)
+      .send({ message: "Internal server error", data: err.message });
+  }
+});
+
+app.post("/api/tasks", async (req, res) => {
+  try {
+    var taskData = req.body;
+
+    if (!taskData.hasOwnProperty("ownerID") 
+        || !taskData.hasOwnProperty("date")
+        || !taskData.hasOwnProperty("duration")
+        || !taskData.hasOwnProperty("numberOfDogs")
+        || !taskData.hasOwnProperty("sizeOfDogs")
+    ) {
+      res.status(500).send({
+        message: "Internal server error",
+        data: "Tasks must have ownerID, email, date, duration, numberOfDogs and sizeOfDogs",
+      });
+      return;
+    }
+
+    const taskOwnerID = taskData.ownerID;
+    const owner = await User.findOne({_id: taskOwnerID});
+
+    if (!owner) {
+      res.status(500).send({
+        message: "Internal server error",
+        data: "User does not exist",
+      });
+      return;
+    }
+
+    if (taskData.numberOfDogs === 0) {
+      res.status(500).send({
+        message: "Internal server error",
+        data: "Number of dogs must be at least 1",
+      });
+      return;
+    }
+
+    if (taskData.numberOfDogs !== taskData.sizeOfDogs.length) {
+      res.status(500).send({
+        message: "Internal server error",
+        data: "Must provided sizes of all dogs",
+      });
+      return;
+    }
+
+    const newTask = new Task(taskData);
+    newTask.save();
+
+    owner.pendingTasks.push(newTask._id);
+    owner.save();
+    // console.log(bob);
+
+    res.status(201).send({ message: "OK", data: newTask });
   } catch (err) {
     res
       .status(500)
