@@ -4,21 +4,27 @@ var mongoose = require("mongoose");
 // Define our task schema
 var TaskSchema = new mongoose.Schema({
   ownerID: String,
-  pendingWalkers: {
-    type: [String],
-    default: [],
-  },
   date: Date,
   duration: Number,
   numberOfDogs: Number,
   sizeOfDogs: [Number],
+  location: String,
+  pendingWalkers: {
+    type: [String],
+    default: [],
+  },
+  completed: {
+    type: Boolean,
+    default: false,
+  },
+  assignedWalker: {
+    type: String,
+    default: undefined,
+  },
   dateCreated: {
     type: Date,
     default: Date.now,
   },
-  location: String,
-  completed: Boolean,
-  assignedWalker: String,
 });
 
 // Export the Mongoose model
