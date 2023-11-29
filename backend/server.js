@@ -11,7 +11,6 @@ const app = express();
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
-console.log("ITS HERE ITS HERE:" + mongoSecrets.mongo_connection);
 mongoose.connect(mongoSecrets.mongo_connection, { useNewUrlParser: true });
 const db = mongoose.connection;
 
@@ -56,7 +55,7 @@ app.post("/api/users", async (req, res) => {
       return;
     }
 
-    console.log(`USER DATA: ${userData}`);
+    // console.log(`USER DATA: ${userData}`);
     const userEmail = userData.email;
     const existingUser = await User.findOne({ email: userEmail });
 
