@@ -8,7 +8,7 @@ var TaskSchema = new mongoose.Schema({
   duration: Number,
   numberOfDogs: Number,
   sizeOfDogs: [Number],
-  location: String,
+  location: [String],
   pendingWalkers: {
     type: [String],
     default: [],

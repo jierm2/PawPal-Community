@@ -143,10 +143,11 @@ app.post("/api/tasks", async (req, res) => {
         || !taskData.hasOwnProperty("duration")
         || !taskData.hasOwnProperty("numberOfDogs")
         || !taskData.hasOwnProperty("sizeOfDogs")
+        || !taskData.hasOwnProperty("location")
     ) {
       res.status(500).send({
         message: "Internal server error",
-        data: "Tasks must have ownerID, email, date, duration, numberOfDogs and sizeOfDogs",
+        data: "Tasks must have ownerID, email, date, duration, numberOfDogs, sizeOfDogs and location",
       });
       return;
     }
@@ -174,6 +175,14 @@ app.post("/api/tasks", async (req, res) => {
       res.status(500).send({
         message: "Internal server error",
         data: "Must provided sizes of all dogs",
+      });
+      return;
+    }
+
+    if (taskData.location.length !== 2) {
+      res.status(500).send({
+        message: "Internal server error",
+        data: "Invalid location",
       });
       return;
     }
