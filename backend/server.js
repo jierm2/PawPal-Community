@@ -43,6 +43,31 @@ app.get("/api/users", async (req, res) => {
   }
 });
 
+app.get("/api/users/:id", async (req, res) => {
+  try {
+    var select = req.query.select ? JSON.parse(req.query.select) : {};
+    var id = new ObjectId(req.params.id);
+
+    var filter = {
+      _id: id,
+    };
+
+    const user = await User.find(filter, select, {});
+    if (user.length) {
+      // GET
+      res.status(200).send({ message: "OK", data: user });
+    } else {
+      res
+        .status(404)
+        .send({ message: "User not found", data: "User not found" });
+    }
+  } catch (err) {
+    res
+      .status(500)
+      .json({ message: "Internal server error", data: err.message });
+  }
+});
+
 app.post("/api/users", async (req, res) => {
   try {
     // console.log(req.body);
