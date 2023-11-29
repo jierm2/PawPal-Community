@@ -1,0 +1,29 @@
+.white-text {
+    color: white !important;
+  }
+  
+/* App.css */
+
+.button-hover-effect {
+    background-color: #fbbf24; /* amber-400 */
+    color: #1a202c; /* zinc-900 */
+    padding: 0.875rem 1.25rem; /* py-3.5, px-5 */
+    border-radius: 41px; /* rounded-[82px] */
+    text-align: center;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    font-size: 1.125rem; /* text-lg */
+    line-height: 1.75rem; /* leading-7 */
+    font-weight: 500;
+    cursor: pointer;
+  }
+  
+  .button-hover-effect:hover {
+    background-color: #f59e0b; /* a slightly darker shade of amber for contrast */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); /* subtle shadow */
+    transform: translateY(-2px); /* slight move up */
+  }
+  

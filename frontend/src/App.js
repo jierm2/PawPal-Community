@@ -1,16 +1,27 @@
-import logo from "./logo.svg";
+import React from "react";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import "./App.css";
-
-import SignUp from "./signUp";
-import SignIn from "./signIn";
+import HomePageDesktop from "./pages/Home";
+import Login from "./pages/Login";
+import Services from "./pages/Services";
+import Signup from "./pages/Signup";
+import Walker from "./pages/Walker";
+import Mission from "./pages/Mission";
 
 function App() {
   // return <h1 className="text-3xl font-bold underline">Hello world!</h1>;
   return (
-    <div>
-      <SignUp />
-      <SignIn />
-    </div>
+    <Router>
+      <Routes>
+        <Route path="/" element={<HomePageDesktop />} />
+        <Route path="/mission" element={<Mission />} />
+        <Route path="/services" element={<Services />} />
+
+        <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<Signup />} />
+        <Route path="/walker" element={<Walker />} />
+      </Routes>
+    </Router>
   );
 }
 
