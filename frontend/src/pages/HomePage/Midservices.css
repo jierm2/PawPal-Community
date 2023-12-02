@@ -1,0 +1,42 @@
+.services-container {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); /* Create three columns */
+  gap: 1rem; /* Space between grid items */
+  padding: 0 1rem; /* Padding around the grid */
+}
+
+.service-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 1rem;
+}
+
+.service-icon {
+  margin-bottom: 1rem;
+  display: flex;
+  justify-content: center;
+}
+
+.service-item-title {
+  font-size: 1.25rem;
+  margin-bottom: 0.5rem;
+}
+
+.service-item-description {
+  font-size: 1rem;
+  color: white;
+}
+
+@media (max-width: 1024px) {
+  .services-container {
+    grid-template-columns: repeat(2, 1fr); /* Two columns for smaller screens */
+  }
+}
+
+@media (max-width: 768px) {
+  .services-container {
+    grid-template-columns: 1fr; /* One column for mobile screens */
+  }
+}

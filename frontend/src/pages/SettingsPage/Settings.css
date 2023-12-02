@@ -1,0 +1,38 @@
+.settings-page {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 2rem;
+    background-color: #121212; /* Dark background */
+  }
+  
+  .profile-header {
+    text-align: center;
+    color: white;
+  }
+  
+  .profile-image {
+    width: 100px; /* Adjust as needed */
+    border-radius: 50%;
+    margin-bottom: 1rem;
+  }
+  
+  .profile-form {
+    width: 100%;
+    max-width: 500px; /* Adjust as needed */
+  }
+  
+  .actions,
+  .location-section {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    max-width: 500px; /* Adjust as needed */
+    margin-top: 1rem;
+  }
+  
+  .login-link {
+    margin-top: 1rem;
+    text-align: center;
+  }
+  
