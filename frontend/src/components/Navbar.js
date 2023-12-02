@@ -1,48 +1,182 @@
-import * as React from "react";
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import Button from '@mui/material/Button';
-import './Home.css'
-function Navbar(props) {
-    return (<div className="justify-between border border-[color:var(--grey-15,#262626)] bg-zinc-900 self-stretch flex w-full gap-5 pl-16 pr-9 py-6 border-solid items-start max-md:max-w-full max-md:flex-wrap max-md:px-5">
-    <div className="text-white text-3xl font-bold leading-8 grow whitespace-nowrap mt-5">
-      PawPal Community
-    </div>
-    <div className="items-stretch self-center flex justify-between gap-5 my-auto max-md:max-w-full max-md:flex-wrap max-md:justify-center">
-    <Link to="/">
-    <Button className="white-text text-lg leading-7 whitespace-nowrap">
-    Home
-    </Button>
-    </Link>
-    
-    <Link to="/mission">
-    <Button className="white-text text-lg leading-7">Our Mission</Button>
-    </Link>
-    <Link to="/services">
-    <Button className="white-text text-neutral-200 text-lg font-medium leading-7">
-        Services
-      </Button>
-    </Link>
-    <Link to="/walker">
-    <Button className="white-text text-neutral-200 text-lg font-medium leading-7 whitespace-nowrap">
-        Become a Walker
-      </Button>
-    </Link>
-    
-    </div>
-    
-    <div className="items-center self-stretch flex justify-between gap-5">
-    <Link to="/signup">
-    <Button className="white-text text-lg leading-7 grow whitespace-nowrap my-auto">
-        Sign Up
-      </Button>
-    </Link>
-    <Link to="/login">
-    <Button className="white-text text-zinc-900 text-lg leading-7 whitespace-nowrap items-center bg-amber-400 self-stretch grow justify-center px-5 py-3.5 rounded-[82px]">
-        Login
-      </Button>
-    </Link>
-    
-    </div>
-    </div>);
+import { FaBars } from 'react-icons/fa';
+import styled, { keyframes } from 'styled-components';
+
+const Nav = styled.nav`
+  // background: #000;
+  height: 80px;
+  display: flex;
+  justify-content: space-between;
+  padding: 0.5rem calc((100vw - 1200px) / 2);
+  z-index: 10;
+`;
+
+
+const BaseLink = styled(Link)`
+  color: #fff;
+  text-decoration: none;
+  display: block;
+  transition: color 0.3s ease;
+
+  &:hover {
+    color: #fdd835; 
+  }
+`;
+
+const NavLink = styled(BaseLink)`
+  display: flex;
+  align-items: center;
+  padding: 0 1rem;
+  height: 100%;
+  cursor: pointer;
+`;
+
+const Bars = styled(FaBars)`
+  display: none;
+  color: #fff;
+
+  @media screen and (max-width: 768px) {
+    display: block;
+    position: absolute;
+    top: 0;
+    right: 0;
+    transform: translate(-100%, 75%);
+    font-size: 1.8rem;
+    cursor: pointer;
+  }
+`;
+
+const NavMenu = styled.div`
+  display: flex;
+  align-items: center;
+  margin-right: -24px;
+
+  @media screen and (max-width: 768px) {
+    display: none;
+  }
+`;
+
+const NavBtn = styled.nav`
+  display: flex;
+  align-items: center;
+  margin-right: 24px;
+
+  @media screen and (max-width: 768px) {
+    display: none;
+  }
+`;
+
+const NavBtnLink = styled(Link)`
+  border-radius: 4px;
+  background: #FFBA33;
+  padding: 10px 22px;
+  color: #fff;
+  outline: none;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  text-decoration: none;
+
+  &:hover {
+    transition: all 0.2s ease-in-out;
+    background: #fff;
+    color: #010606;
+  }
+`;
+
+const slideDown = keyframes`
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(0); }
+`;
+
+const DropdownMenu = styled.div`
+  display: none;
+  background-color: #f9f9f9;
+  position: absolute;
+  top: 80px; // Adjusted to align with the Nav height
+  min-width: 160px;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  z-index: 1;
+  width: 100%;
+  text-align: center;
+
+  @media screen and (max-width: 768px) {
+    display: ${props => (props.isOpen ? 'block' : 'none')};
+    animation: ${slideDown} 0.3s ease-out;
+  }
+`;
+
+const DropdownItem = styled(BaseLink)`
+  color: black;
+  padding: 12px 16px;
+
+  &:hover {
+    background-color: #f1f1f1;
+  }
+`;
+const TitleLink = styled(NavLink)`
+  font-family: 'Fredoka One', cursive;
+  font-size: 2.5rem; // Adjust the size as needed
+  color: #FFBA33; // Your chosen color
+
+  &:hover {
+    color: #fdd835; // Color for hover state
+    text-decoration: none;
+  }
+`;
+
+const Navbar = () => {
+  const [isOpen, setIsOpen] = useState(false);
+
+  const closeMenu = () => {
+    setIsOpen(false);
+  };
+
+  return (
+    <>
+      <Nav>
+      <TitleLink to='/'>
+    Pawpalcommunity
+  </TitleLink>
+        <Bars onClick={() => setIsOpen(!isOpen)} />
+        <NavMenu>
+          <NavLink to='/mission' activeStyle onClick={closeMenu}style={{ textDecoration: 'line-through' }}>
+            Our Mission
+          </NavLink>
+          <NavLink to='/services' activeStyle onClick={closeMenu}style={{ textDecoration: 'line-through' }}>
+            Services
+          </NavLink>
+          <NavLink to='/walker' activeStyle onClick={closeMenu} style={{ textDecoration: 'line-through' }}>
+            Become a Walker
+          </NavLink>
+          <NavLink to='/sign-up' activeStyle onClick={closeMenu} >
+            Sign Up
+          </NavLink>
+        </NavMenu>
+        <DropdownMenu isOpen={isOpen}>
+          <DropdownItem to='/mission' onClick={closeMenu}>
+          Our Mission
+          </DropdownItem>
+          <DropdownItem to='/services' onClick={closeMenu}>
+            Services
+          </DropdownItem>
+          <DropdownItem to='/walker' onClick={closeMenu}>
+            Become a Walker
+          </DropdownItem>
+          <DropdownItem to='/login' onClick={closeMenu}>
+            Login
+          </DropdownItem>
+          <DropdownItem to='/sign-up' onClick={closeMenu}>
+            Sign Up
+          </DropdownItem>
+        </DropdownMenu>
+        <NavBtn>
+          <NavBtnLink to='/login'>Login</NavBtnLink>
+        </NavBtn>
+      </Nav>
+    </>
+  );
 };
+
 export default Navbar;
