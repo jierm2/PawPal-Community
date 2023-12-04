@@ -141,14 +141,14 @@ const Navbar = () => {
   </TitleLink>
         <Bars onClick={() => setIsOpen(!isOpen)} />
         <NavMenu>
-          <NavLink to='/mission' activeStyle onClick={closeMenu}style={{ textDecoration: 'line-through' }}>
+          <NavLink to='/mission' activeStyle onClick={closeMenu}>
             Our Mission
           </NavLink>
-          <NavLink to='/services' activeStyle onClick={closeMenu}style={{ textDecoration: 'line-through' }}>
+          <NavLink to='/services' activeStyle onClick={closeMenu}>
             Services
           </NavLink>
-          <NavLink to='/walker' activeStyle onClick={closeMenu} style={{ textDecoration: 'line-through' }}>
-            Become a Walker
+          <NavLink to='/walker' activeStyle onClick={closeMenu} >
+            Find a Walker
           </NavLink>
           <NavLink to='/sign-up' activeStyle onClick={closeMenu} >
             Sign Up
