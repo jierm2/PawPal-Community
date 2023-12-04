@@ -1,0 +1,9 @@
+.custom-dropdown {
+    position: relative;
+    width: 505px; /* Set your preferred width */
+    height: 50px;
+    background-color: #C0C0C0; /* Set the background color to gray */
+    padding: 10px;
+    border: 1px solid #0a0909;
+    border-radius: 8px;
+  }
