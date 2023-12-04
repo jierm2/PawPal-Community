@@ -1,0 +1,103 @@
+  .about-page-desktop {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    width: 100%;
+  }
+  
+  .about-page-desktop .div {
+    background-color: FFBA33; 
+    height: 900px;
+    overflow: hidden;
+    position: relative;
+    width: 1920px;
+  }
+  
+  .about-page-desktop .container {
+    align-items: flex-start;
+    background-color: #FFBA33;
+    border-radius: 20px;
+    display: flex;
+    left: 80px;
+    padding: 50px;
+    position: absolute;
+    top: 50px;
+    width: 1599px;
+  }
+  
+  .about-page-desktop .sub-container {
+    align-items: flex-start;
+    background-color: #48260d;
+    border-radius: 20px 0px 80px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 23px;
+    padding: 80px;
+    position: relative;
+    width: 791px;
+    z-index: 1;
+  }
+  
+  .about-page-desktop .text-container {
+    align-items: flex-start;
+    align-self: stretch;
+    display: flex;
+    flex: 0 0 auto;
+    flex-direction: column;
+    position: relative;
+    width: 100%;
+  }
+  
+  .about-page-desktop .text {
+    align-self: stretch;
+    color: #ffffff;
+    font-family: "Lexend-Regular", Helvetica;
+    font-size: 20px;
+    font-weight: 400;
+    letter-spacing: 0;
+    line-height: 30px;
+    margin-top: -1px;
+    position: relative;
+  }
+  
+  .about-page-desktop .heading {
+    align-self: stretch;
+    color: transparent;
+    font-family: "Lexend-Medium", Helvetica;
+    font-size: 58px;
+    font-weight: 500;
+    letter-spacing: 0;
+    line-height: 75.4px;
+    position: relative;
+  }
+  
+  .about-page-desktop .text-wrapper {
+    color: #ffffff;
+  }
+  
+  .about-page-desktop .span {
+    color: #ffb933;
+  }
+  
+  .about-page-desktop .paragraph {
+    align-self: stretch;
+    color: var(--grey-70);
+    font-family: "Lexend-Light", Helvetica;
+    font-size: 18px;
+    font-weight: 300;
+    letter-spacing: 0;
+    line-height: 27px;
+    position: relative;
+  }
+  
+  .about-page-desktop .image {
+    flex: 1; 
+    flex-grow: 1; 
+    height: 600px;
+    margin-left: -260px;
+    object-fit: cover; 
+    position: relative;
+    z-index: 0;
+    top: 50px;
+  }
+  

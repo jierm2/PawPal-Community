@@ -6,7 +6,7 @@ import Login from "./pages/LoginPage/Login";
 import Services from "./pages/Services";
 import Signup from "./pages/SignupPage/Signup";
 import Walker from "./pages/WalkerPage/Walker";
-import Mission from "./pages/Mission";
+import Mission from "./pages/MissionPage/Mission";
 import Navbar from './components/Navbar';
 import Footer from "./components/Footer";
 import Settings from "./pages/SettingsPage/Settings";
