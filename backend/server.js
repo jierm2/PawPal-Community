@@ -46,7 +46,7 @@ app.get("/api/users", async (req, res) => {
 app.get("/api/users/:id", async (req, res) => {
   try {
     var select = req.query.select ? JSON.parse(req.query.select) : {};
-    var id = new ObjectId(req.params.id);
+    var id = new mongoose.Types.ObjectId(req.params.id);
 
     var filter = {
       _id: id,
@@ -106,6 +106,42 @@ app.post("/api/users", async (req, res) => {
   }
 });
 
+app.delete("/api/users/:id", async (req, res) => {
+  try {
+    var id = new mongoose.Types.ObjectId(req.params.id);
+    const user = await User.findById(id);
+
+    if (user) {
+      // DELETE
+      var pendingTasks = user.pendingTasks;
+
+      for (var i = 0; i < pendingTasks.length; i++) {
+        var taskId = pendingTasks[i];
+
+        var update = {
+          $set: {
+            ownerID: "unassigned",
+          },
+        };
+
+        var filter = {
+          _id: taskId,
+        };
+        await Task.updateOne(filter, update);
+      }
+
+      await User.deleteOne({ _id: id });
+      res.status(200).send({ message: "User deleted", data: user });
+    } else {
+      res.status(404).send({ message: "User not found", data: {} });
+    }
+  } catch (err) {
+    res
+      .status(500)
+      .json({ message: "Internal server error", data: err.message });
+  }
+});
+
 app.get("/api/tasks", async (req, res) => {
   try {
     var where = req.query.where ? JSON.parse(req.query.where) : {};
@@ -160,19 +196,19 @@ app.get("/api/task/:id", async (req, res) => {
       .status(500)
       .send({ message: "Internal server error", data: err.message });
   }
-
 });
 
 app.post("/api/tasks", async (req, res) => {
   try {
     var taskData = req.body;
 
-    if (!taskData.hasOwnProperty("ownerID") 
-        || !taskData.hasOwnProperty("date")
-        || !taskData.hasOwnProperty("duration")
-        || !taskData.hasOwnProperty("numberOfDogs")
-        || !taskData.hasOwnProperty("sizeOfDogs")
-        || !taskData.hasOwnProperty("location")
+    if (
+      !taskData.hasOwnProperty("ownerID") ||
+      !taskData.hasOwnProperty("date") ||
+      !taskData.hasOwnProperty("duration") ||
+      !taskData.hasOwnProperty("numberOfDogs") ||
+      !taskData.hasOwnProperty("sizeOfDogs") ||
+      !taskData.hasOwnProperty("location")
     ) {
       res.status(500).send({
         message: "Internal server error",
@@ -182,7 +218,7 @@ app.post("/api/tasks", async (req, res) => {
     }
 
     const taskOwnerID = taskData.ownerID;
-    const owner = await User.findOne({_id: taskOwnerID});
+    const owner = await User.findOne({ _id: taskOwnerID });
 
     if (!owner) {
       res.status(500).send({
