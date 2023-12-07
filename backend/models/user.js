@@ -5,22 +5,23 @@ var mongoose = require("mongoose");
 var UserSchema = new mongoose.Schema({
   name: String,
   email: String,
-  tasks: {
-    type: [String],
-    default: [],
-  },
-  pendingTasks: {
-    type: [String],
-    default: [],
-  },
-  assignedTasks: {
-    type: [String],
-    default: [],
-  },
-  completedTasks: {
-    type: [String],
-    default: [],
-  },
+  // tasks: {
+  //   type: [String],
+  //   default: [],
+  // },
+  // pendingTasks: {
+  //   type: [String],
+  //   default: [],
+  // },
+  // assignedTasks: {
+  //   type: [String],
+  //   default: [],
+  // },
+  // completedTasks: {
+  //   type: [String],
+  //   default: [],
+  // },
+  location: [Number],
   dateCreated: {
     type: Date,
     default: Date.now,

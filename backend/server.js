@@ -59,7 +59,7 @@ app.get("/api/users/:id", async (req, res) => {
     } else {
       res
         .status(404)
-        .send({ message: "User not found", data: "User not found" });
+        .send({ message: "User not found", data: "User not found: " + req.params.id });
     }
   } catch (err) {
     res
@@ -73,10 +73,10 @@ app.post("/api/users", async (req, res) => {
     // console.log(req.body);
     var userData = req.body;
 
-    if (!userData.hasOwnProperty("name") || !userData.hasOwnProperty("email")) {
+    if (!userData.hasOwnProperty("name") || !userData.hasOwnProperty("email") || !userData.hasOwnProperty("location")) {
       res.status(500).send({
-        message: "User must have a name and an email",
-        data: "User must have a name and an email",
+        message: "User must have a name, location and an email",
+        data: "User must have a name, location and an email",
       });
       return;
     }
@@ -87,7 +87,7 @@ app.post("/api/users", async (req, res) => {
 
     if (existingUser) {
       res.status(500).send({
-        message: "Internal server error",
+        message: "User email already exists",
         data: "User email already exists",
       });
       return;
@@ -110,31 +110,77 @@ app.delete("/api/users/:id", async (req, res) => {
   try {
     var id = new mongoose.Types.ObjectId(req.params.id);
     const user = await User.findById(id);
-
-    if (user) {
-      // DELETE
-      var pendingTasks = user.pendingTasks;
-
-      for (var i = 0; i < pendingTasks.length; i++) {
-        var taskId = pendingTasks[i];
-
-        var update = {
-          $set: {
-            ownerID: "unassigned",
-          },
-        };
-
-        var filter = {
-          _id: taskId,
-        };
-        await Task.updateOne(filter, update);
-      }
-
-      await User.deleteOne({ _id: id });
-      res.status(200).send({ message: "User deleted", data: user });
-    } else {
-      res.status(404).send({ message: "User not found", data: {} });
+    if (user == null) {
+      res
+        .status(404)
+        .send({ message: "User not found", data: "User not found: " + user.id});
+      return
     }
+
+    await Task.updateMany(
+      {pendingWalkers: user._id}, 
+      {$pull: {pendingWalkers: user._id}}
+    );
+
+    await Task.updateMany(
+      {assignedWalker: user._id, completed: false},
+      {assignedWalker: "unassigned"}
+    );
+
+    await Task.updateMany(
+      {assignedWalker: user._id, completed: true},
+      {assignedWalker: "deleted"}
+    );
+
+    await Task.deleteMany(
+      {ownerID: user._id, completed: false}
+    );
+
+    await Task.updateMany(
+      {ownerID: user._id, completed: true},
+      {ownerID: "deleted"}
+    );
+
+    await User.deleteOne({ _id: id });
+    res.status(200).send({ message: "OK", data: user });
+  } catch (err) {
+    res
+      .status(500)
+      .json({ message: "Internal server error", data: err.message });
+  }
+});
+
+app.put("/api/users/:id", async (req, res) => {
+  try {
+    var userID = req.params.id;
+
+    var updatedUserData = req.body;
+
+    var user = await User.findOne({_id: userID});
+    if (user == null) {
+      res
+        .status(404)
+        .send({ message: "User not found", data: "User not found: " + userID});
+      return
+    }
+
+    if (updatedUserData.email !== undefined) {
+      res
+        .status(500)
+        .json({ message: "Cannot change user email", data: "Cannot change user email" });
+      return;
+    }
+
+    if (updatedUserData.name !== undefined) {
+      res
+        .status(500)
+        .json({ message: "Cannot change user name", data: "cannot change user name" });
+      return;
+    }
+
+    var updatedUser = await User.findOneAndUpdate({_id: userID}, updatedUserData);
+    res.status(200).send({ message: "OK", data: updatedUser });
+
   } catch (err) {
     res
       .status(500)
@@ -170,26 +216,19 @@ app.get("/api/tasks", async (req, res) => {
   }
 });
 
-app.get("/api/task/:id", async (req, res) => {
+app.get("/api/tasks/:id", async (req, res) => {
   try {
-    if (req.params.id === undefined) {
-      res.status(500).send({
-        message: "No id provided",
-        data: "User must provide an id to a corresponding task"
-      });
-      return;
-    }
-    const document = await Task.findOne({_id: req.params.id});
-    if (document === null) {
+    const task = await Task.findOne({_id: req.params.id});
+    if (task === null) {
       res.status(404).send({
         message: "Task not found",
-        data: "No task matching the provided id"
+        data: "Task not found: " + req.params.id
       });
       return;
     }
     res.status(200).send({
       message: "OK",
-      data: document
+      data: task 
     });
   } catch (err) {
     res
@@ -211,7 +250,7 @@ app.post("/api/tasks", async (req, res) => {
       !taskData.hasOwnProperty("location")
     ) {
       res.status(500).send({
-        message: "Internal server error",
+        message: "Tasks must have ownerID, date, duration, numberOfDogs, sizeOfDogs and location",
         data: "Tasks must have ownerID, date, duration, numberOfDogs, sizeOfDogs and location",
       });
       return;
@@ -221,16 +260,16 @@ app.post("/api/tasks", async (req, res) => {
     const owner = await User.findOne({ _id: taskOwnerID });
 
     if (!owner) {
-      res.status(500).send({
-        message: "Internal server error",
-        data: "User does not exist",
+      res.status(404).send({
+        message: "User not found",
+        data: "User not found: " + taskOwnerID,
       });
       return;
     }
 
     if (taskData.numberOfDogs === 0) {
       res.status(500).send({
-        message: "Internal server error",
+        message: "Number of dogs must be at least 1",
         data: "Number of dogs must be at least 1",
       });
       return;
@@ -238,7 +277,7 @@ app.post("/api/tasks", async (req, res) => {
 
     if (taskData.numberOfDogs !== taskData.sizeOfDogs.length) {
       res.status(500).send({
-        message: "Internal server error",
+        message: "Must provided sizes of all dogs",
         data: "Must provided sizes of all dogs",
       });
       return;
@@ -246,7 +285,7 @@ app.post("/api/tasks", async (req, res) => {
 
     if (taskData.location.length !== 2) {
       res.status(500).send({
-        message: "Internal server error",
+        message: "Invalid location",
         data: "Invalid location",
       });
       return;
@@ -255,8 +294,8 @@ app.post("/api/tasks", async (req, res) => {
     const newTask = new Task(taskData);
     newTask.save();
 
-    owner.tasks.push(newTask._id);
-    owner.save();
+    // owner.tasks.push(newTask._id);
+    // owner.save();
     // console.log(bob);
 
     res.status(201).send({ message: "OK", data: newTask });
@@ -267,21 +306,13 @@ app.post("/api/tasks", async (req, res) => {
   }
 });
 
-app.delete("/api/task/:id", async (req, res) => {
+app.delete("/api/tasks/:id", async (req, res) => {
   try {
-    if (req.params.id === undefined) {
-      res.status(500).send({
-        message: "No id provided",
-        data: "User must provide an id to a corresponding task"
-      });
-      return;
-    }
-
     const task = await Task.findOne({_id: req.params.id});
     if (task === null) {
       res.status(404).send({
         message: "Task not found",
-        data: "No task matching the provided id"
+        data: "Task not found: " + req.params.id
       });
       return;
     }
@@ -289,21 +320,29 @@ app.delete("/api/task/:id", async (req, res) => {
     if (diff > 0) {
       res.status(500).send({
         message: "Cannot delete task in the past",
-        data: "Tasks in the past cannot be deleted"
+        data: "Cannot delete task in the past"
       });
       return;
     }
-    let owner = await User.findOne({_id: task.ownerID});
-    console.log(owner);
-    owner.tasks = owner.tasks.filter((element) => {return element !== req.params.id});
-    await owner.save();
+    // if (task.ownerID !== "deleted") {
+    //   let owner = await User.findOne({_id: task.ownerID});
+    //   console.log(owner);
+    //   owner.tasks = owner.tasks.filter((element) => {return element !== req.params.id});
+    //   await owner.save();
+    // }
 
-    let pendingWalkers = await User.find({_id: {$in: task.pendingWalkers}});
-    for (pendingWalker of pendingWalkers) {
-      pendingWalker.pendingTasks = pendingWalker.pendingTasks.filter((element) => {return element !== req.params.id});
-      pendingWalker.assignedTasks = pendingWalker.assignedTasks.filter((element) => {return element !== req.params.id});
-      await pendingWalker.save();
-    }
+    // if (!(task.assignedWalker in ["unassigned", "deleted"])) {
+    //   let assignedWalker = await User.findOne({_id: task.assignedWalker});
+    //   assignedWalker.assignedTasks = assignedWalker.assignedTasks.filter((element) => {return element !== req.params.id});
+    //   await assignedWalker.save();
+    // }
+
+    // let pendingWalkers = await User.find({_id: {$in: task.pendingWalkers}});
+    // for (pendingWalker of pendingWalkers) {
+    //   pendingWalker.pendingTasks = pendingWalker.pendingTasks.filter((element) => {return element !== req.params.id});
+    //   pendingWalker.assignedTasks = pendingWalker.assignedTasks.filter((element) => {return element !== req.params.id});
+    //   await pendingWalker.save();
+    // }
 
     await Task.deleteOne({_id: task._id});
     res.status(200).send({
@@ -317,23 +356,15 @@ app.delete("/api/task/:id", async (req, res) => {
   }
 });
 
-app.put("/api/task/:id", async (req, res) => {
+app.put("/api/tasks/:id", async (req, res) => {
   try {
-    if (req.params.id === undefined) {
-      res.status(500).send({
-        message: "No id provided",
-        data: "User must provide an id to a corresponding task"
-      });
-      return;
-    }
-
     const taskData = req.body;
 
     const task = await Task.findOne({_id: req.params.id});
     if (task === null) {
       res.status(404).send({
         message: "Task not found",
-        data: "No task matching the provided id"
+        data: "Task not found"
       });
       return;
     }
@@ -341,15 +372,16 @@ app.put("/api/task/:id", async (req, res) => {
     if (task.completed === true) {
       res.status(500).send({
         message: "Cannot update a completed task",
-        data: "Tasks that have been completed cannot be updated"
+        data: "Cannot update a completed task"
       });
       return;
     }
 
+
     if (taskData.dateCreated !== undefined && taskData.dateCreated !== task.dateCreated) {
       res.status(500).send({
         message: "Cannot change date created",
-        data: "Date of creation cannot be changed for a task"
+        data: "Cannot change date created"
       });
       return;
     }
@@ -357,31 +389,38 @@ app.put("/api/task/:id", async (req, res) => {
     if (taskData.ownerID !== undefined && taskData.ownerID !== task.ownerID) {
       res.status(500).send({
         message: "Cannot change owner",
-        data: "Tasks cannot be reassigned to a new owner"
+        data: "Cannot change owner"
       });
       return;
     }
 
     if (taskData.completed !== undefined) {
       if (taskData.completed === true) {
+        if (task.assignedWalker === "deleted" || task.assignedWalker ===  "unassigned") {
+          res.status(500).send({
+            message: "Cannot complete unassigned task",
+            data: "Cannot complete unassigned task"
+          });
+          return;
+        }
         let diff = new Date().getTime() - task.date.getTime();
         if (diff < 0) {
           res.status(500).send({
             message: "Cannot complete task in the future",
-            data: "Tasks that have a date in the future cannot be assigned complete"
+            data: "Cannot complete task in the future"
           });
           return;
         }
-        let assignedWalker = await User.findOne({_id: taskData.assignedWalker});
+        let assignedWalker = await User.findOne({_id: task.assignedWalker});
         if (assignedWalker === null) {
           res.status(404).send({
             message: "User not found",
-            data: "Assigned walker not found for task"
+            data: "User not found: " + task.assignedWalker
           });
           return;
         }
-        assignedWalker.assignedTasks = assignedWalker.assignedTasks.filter((element) => {return element !== task._id});
-        assignedWalker.completedTasks = assignedWalker.completedTasks + [task._id];
+        // assignedWalker.assignedTasks = assignedWalker.assignedTasks.filter((element) => {return element !== task._id});
+        // assignedWalker.completedTasks = assignedWalker.completedTasks + [task._id];
       }
     }
 
@@ -390,18 +429,25 @@ app.put("/api/task/:id", async (req, res) => {
       if (assignedWalker === null) {
         res.status(404).send({
           message: "User not found",
-          data: "No user matching the provided id: ${taskData.assignedWalker}"
+          data: "User not found: " + taskData.assignedWalker
         });
         return;
       }
-      assignedWalker.assignedTasks = assignedWalker.assignedTasks + [task._id];
-      await assignedWalker.save();
-      let pendingWalkers = await User.find({_id: {$in: task.pendingWalkers}});
-      for (pendingWalker of pendingWalkers) {
-        pendingWalker.pendingTasks = pendingWalker.pendingTasks.filter((element) => {return element !== req.params.id});
-        pendingWalker.assignedTasks = pendingWalker.assignedTasks.filter((element) => {return element !== req.params.id});
-        await pendingWalker.save();
+      if (taskData.pendingWalkers === undefined || taskData.pendingWalkers.length !== 0) {
+        res.status(404).send({
+          message: "Task assignments must remove all pendingWalkers",
+          data: "Task assignments must remove all pendingWalkers" 
+        });
+        return;
       }
+      // assignedWalker.assignedTasks = assignedWalker.assignedTasks + [task._id];
+      // await assignedWalker.save();
+      // let pendingWalkers = await User.find({_id: {$in: task.pendingWalkers}});
+      // for (pendingWalker of pendingWalkers) {
+      //   pendingWalker.pendingTasks = pendingWalker.pendingTasks.filter((element) => {return element !== req.params.id});
+      //   pendingWalker.assignedTasks = pendingWalker.assignedTasks.filter((element) => {return element !== req.params.id});
+      //   await pendingWalker.save();
+      // }
     }
 
     const updatedTask = await Task.findOneAndUpdate({_id: task._id}, taskData);
