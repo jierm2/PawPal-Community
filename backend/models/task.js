@@ -19,7 +19,7 @@ var TaskSchema = new mongoose.Schema({
   },
   assignedWalker: {
     type: String,
-    default: undefined,
+    default: "",
   },
   dateCreated: {
     type: Date,

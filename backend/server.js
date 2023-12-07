@@ -134,6 +134,35 @@ app.get("/api/tasks", async (req, res) => {
   }
 });
 
+app.get("/api/task/:id", async (req, res) => {
+  try {
+    if (req.params.id === undefined) {
+      res.status(500).send({
+        message: "No id provided",
+        data: "User must provide an id to a corresponding task"
+      });
+      return;
+    }
+    const document = await Task.findOne({_id: req.params.id});
+    if (document === null) {
+      res.status(404).send({
+        message: "Task not found",
+        data: "No task matching the provided id"
+      });
+      return;
+    }
+    res.status(200).send({
+      message: "OK",
+      data: document
+    });
+  } catch (err) {
+    res
+      .status(500)
+      .send({ message: "Internal server error", data: err.message });
+  }
+
+});
+
 app.post("/api/tasks", async (req, res) => {
   try {
     var taskData = req.body;
@@ -147,7 +176,7 @@ app.post("/api/tasks", async (req, res) => {
     ) {
       res.status(500).send({
         message: "Internal server error",
-        data: "Tasks must have ownerID, email, date, duration, numberOfDogs, sizeOfDogs and location",
+        data: "Tasks must have ownerID, date, duration, numberOfDogs, sizeOfDogs and location",
       });
       return;
     }
@@ -190,7 +219,7 @@ app.post("/api/tasks", async (req, res) => {
     const newTask = new Task(taskData);
     newTask.save();
 
-    owner.pendingTasks.push(newTask._id);
+    owner.tasks.push(newTask._id);
     owner.save();
     // console.log(bob);
 
@@ -201,6 +230,157 @@ app.post("/api/tasks", async (req, res) => {
       .send({ message: "Internal server error", data: err.message });
   }
 });
+
+app.delete("/api/task/:id", async (req, res) => {
+  try {
+    if (req.params.id === undefined) {
+      res.status(500).send({
+        message: "No id provided",
+        data: "User must provide an id to a corresponding task"
+      });
+      return;
+    }
+
+    const task = await Task.findOne({_id: req.params.id});
+    if (task === null) {
+      res.status(404).send({
+        message: "Task not found",
+        data: "No task matching the provided id"
+      });
+      return;
+    }
+    let diff = new Date().getTime() - new Date(task.date).getTime();
+    if (diff > 0) {
+      res.status(500).send({
+        message: "Cannot delete task in the past",
+        data: "Tasks in the past cannot be deleted"
+      });
+      return;
+    }
+    let owner = await User.findOne({_id: task.ownerID});
+    console.log(owner);
+    owner.tasks = owner.tasks.filter((element) => {return element !== req.params.id});
+    await owner.save();
+
+    let pendingWalkers = await User.find({_id: {$in: task.pendingWalkers}});
+    for (pendingWalker of pendingWalkers) {
+      pendingWalker.pendingTasks = pendingWalker.pendingTasks.filter((element) => {return element !== req.params.id});
+      pendingWalker.assignedTasks = pendingWalker.assignedTasks.filter((element) => {return element !== req.params.id});
+      await pendingWalker.save();
+    }
+
+    await Task.deleteOne({_id: task._id});
+    res.status(200).send({
+      message: "OK",
+      data: task,
+    });
+  } catch (err) {
+    res
+      .status(500)
+      .send({ message: "Internal server error", data: err.message });
+  }
+});
+
+app.put("/api/task/:id", async (req, res) => {
+  try {
+    if (req.params.id === undefined) {
+      res.status(500).send({
+        message: "No id provided",
+        data: "User must provide an id to a corresponding task"
+      });
+      return;
+    }
+
+    const taskData = req.body;
+
+    const task = await Task.findOne({_id: req.params.id});
+    if (task === null) {
+      res.status(404).send({
+        message: "Task not found",
+        data: "No task matching the provided id"
+      });
+      return;
+    }
+
+    if (task.completed === true) {
+      res.status(500).send({
+        message: "Cannot update a completed task",
+        data: "Tasks that have been completed cannot be updated"
+      });
+      return;
+    }
+
+    if (taskData.dateCreated !== undefined && taskData.dateCreated !== task.dateCreated) {
+      res.status(500).send({
+        message: "Cannot change date created",
+        data: "Date of creation cannot be changed for a task"
+      });
+      return;
+    }
+
+    if (taskData.ownerID !== undefined && taskData.ownerID !== task.ownerID) {
+      res.status(500).send({
+        message: "Cannot change owner",
+        data: "Tasks cannot be reassigned to a new owner"
+      });
+      return;
+    }
+
+    if (taskData.completed !== undefined) {
+      if (taskData.completed === true) {
+        let diff = new Date().getTime() - task.date.getTime();
+        if (diff < 0) {
+          res.status(500).send({
+            message: "Cannot complete task in the future",
+            data: "Tasks that have a date in the future cannot be assigned complete"
+          });
+          return;
+        }
+        let assignedWalker = await User.findOne({_id: taskData.assignedWalker});
+        if (assignedWalker === null) {
+          res.status(404).send({
+            message: "User not found",
+            data: "Assigned walker not found for task"
+          });
+          return;
+        }
+        assignedWalker.assignedTasks = assignedWalker.assignedTasks.filter((element) => {return element !== task._id});
+        assignedWalker.completedTasks = assignedWalker.completedTasks + [task._id];
+      }
+    }
+
+    if (taskData.assignedWalker !== undefined) {
+      let assignedWalker = await User.findOne({_id: taskData.assignedWalker});
+      if (assignedWalker === null) {
+        res.status(404).send({
+          message: "User not found",
+          data: "No user matching the provided id: ${taskData.assignedWalker}"
+        });
+        return;
+      }
+      assignedWalker.assignedTasks = assignedWalker.assignedTasks + [task._id];
+      await assignedWalker.save();
+      let pendingWalkers = await User.find({_id: {$in: task.pendingWalkers}});
+      for (pendingWalker of pendingWalkers) {
+        pendingWalker.pendingTasks = pendingWalker.pendingTasks.filter((element) => {return element !== req.params.id});
+        pendingWalker.assignedTasks = pendingWalker.assignedTasks.filter((element) => {return element !== req.params.id});
+        await pendingWalker.save();
+      }
+    }
+
+    const updatedTask = await Task.findOneAndUpdate({_id: task._id}, taskData);
+
+    res.status(200).send({
+      message: "OK",
+      data: updatedTask,
+    });
+  } catch (err) {
+    res
+      .status(500)
+      .send({ message: "Internal server error", data: err.message });
+  }
+});
+
 
 db.on("connected", () => {
   console.log("CONNECTED TO DA DB :SUNGLASSES:");
