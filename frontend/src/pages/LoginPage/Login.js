@@ -57,7 +57,10 @@ function Login() {
         console.log(userCredential);
       })
       .catch((error) => {
-        console.log(error);
+        const errorCode = error.code;
+        if (errorCode === "auth/wrong-password") {
+          // user inputted wrong password
+        }
       });
   };
 
