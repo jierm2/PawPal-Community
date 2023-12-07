@@ -8,7 +8,7 @@ var TaskSchema = new mongoose.Schema({
   duration: Number,
   numberOfDogs: Number,
   sizeOfDogs: [Number],
-  location: [String],
+  location: [Number],
   pendingWalkers: {
     type: [String],
     default: [],
@@ -19,7 +19,7 @@ var TaskSchema = new mongoose.Schema({
   },
   assignedWalker: {
     type: String,
-    default: undefined,
+    default: "unassigned",
   },
   dateCreated: {
     type: Date,
