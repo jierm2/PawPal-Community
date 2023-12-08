@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { FaBars } from 'react-icons/fa';
 import styled, { keyframes } from 'styled-components';
+import { useAuth } from '../auth';
+import { getAuth, signOut } from 'firebase/auth';
 
 const Nav = styled.nav`
   // background: #000;
@@ -128,35 +130,53 @@ const TitleLink = styled(NavLink)`
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const { currentUser } = useAuth();
 
   const closeMenu = () => {
     setIsOpen(false);
+  };
+  const handleLogout = async () => {
+    try {
+      await signOut(getAuth());
+    } catch (error) {
+      console.error("Error signing out: ", error);
+    }
   };
 
   return (
     <>
       <Nav>
-      <TitleLink to='/'>
-    Pawpalcommunity
-  </TitleLink>
+        <TitleLink to='/'>
+          Pawpalcommunity
+        </TitleLink>
         <Bars onClick={() => setIsOpen(!isOpen)} />
         <NavMenu>
-          <NavLink to='/mission' activeStyle onClick={closeMenu}>
+          <NavLink to='/mission' onClick={closeMenu}>
             Our Mission
           </NavLink>
-          <NavLink to='/services' activeStyle onClick={closeMenu}>
+          <NavLink to='/services' onClick={closeMenu}>
             Services
           </NavLink>
-          <NavLink to='/walker' activeStyle onClick={closeMenu} >
+          <NavLink to='/walker' onClick={closeMenu}>
             Find a Walker
           </NavLink>
-          <NavLink to='/sign-up' activeStyle onClick={closeMenu} >
-            Sign Up
-          </NavLink>
+          {!currentUser && (
+            <>
+
+              <NavLink to='/sign-up' onClick={closeMenu}>
+                Sign Up
+              </NavLink>
+            </>
+          )}
+          {currentUser && (
+            <NavLink onClick={handleLogout}>
+              Logout
+            </NavLink>
+          )}
         </NavMenu>
         <DropdownMenu isOpen={isOpen}>
           <DropdownItem to='/mission' onClick={closeMenu}>
-          Our Mission
+            Our Mission
           </DropdownItem>
           <DropdownItem to='/services' onClick={closeMenu}>
             Services
@@ -164,16 +184,27 @@ const Navbar = () => {
           <DropdownItem to='/walker' onClick={closeMenu}>
             Become a Walker
           </DropdownItem>
-          <DropdownItem to='/login' onClick={closeMenu}>
-            Login
-          </DropdownItem>
-          <DropdownItem to='/sign-up' onClick={closeMenu}>
-            Sign Up
-          </DropdownItem>
+          {!currentUser && (
+            <>
+              <DropdownItem to='/login' onClick={closeMenu}>
+                Login
+              </DropdownItem>
+              <DropdownItem to='/sign-up' onClick={closeMenu}>
+                Sign Up
+              </DropdownItem>
+            </>
+          )}
+          {currentUser && (
+            <DropdownItem onClick={handleLogout}>
+              Logout
+            </DropdownItem>
+          )}
         </DropdownMenu>
-        <NavBtn>
-          <NavBtnLink to='/login'>Login</NavBtnLink>
-        </NavBtn>
+        {!currentUser && (
+          <NavBtn>
+            <NavBtnLink to='/login'>Login</NavBtnLink>
+          </NavBtn>
+        )}
       </Nav>
     </>
   );

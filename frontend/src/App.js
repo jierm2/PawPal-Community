@@ -11,9 +11,14 @@ import Navbar from './components/Navbar';
 import Footer from "./components/Footer";
 import Settings from "./pages/SettingsPage/Settings";
 import { Box } from '@mui/material';
+import { AuthProvider } from "./auth";
+
+import ProtectedRoute from "./util/ProtectRoute";
+import PublicRoute from "./util/PublicRoute";
 
 function App() {
   return (
+    <AuthProvider>
     <Router>
       <Navbar />
       <Box
@@ -30,16 +35,17 @@ function App() {
         <Route path="/" element={<HomePageDesktop />} />
         <Route path="/mission" element={<Mission />} />
         <Route path="/services" element={<Services />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/sign-up" element={<Signup />} />
-        <Route path="/walker" element={<Walker />} />
-        <Route path="/settings" element={<Settings />} />
+        <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
+        <Route path="/sign-up" element={<PublicRoute><Signup /></PublicRoute>} />
+        <Route path="/walker" element={<ProtectedRoute><Walker /></ProtectedRoute>} />
+        <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
 
       </Routes>
       </Box>
       <Footer/>
       </Box>
     </Router>
+    </AuthProvider>
   );
 }
 

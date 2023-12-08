@@ -1,11 +1,13 @@
 import React from "react";
+import { auth } from "../../secrets/firebase-secrets";
+
 import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { auth } from "../../secrets/firebase-secrets";
-import { signInWithEmailAndPassword } from "firebase/auth";
+import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
+import { useNavigate } from "react-router-dom";
 
 // Create a theme instance.
 const theme = createTheme({
@@ -47,35 +49,45 @@ const theme = createTheme({
 });
 
 function Login() {
+  const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState(""); // State for error message
 
   const signIn = (e) => {
     e.preventDefault();
+    const auth = getAuth();
     signInWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
         console.log(userCredential);
+        navigate("/settings"); // Redirect to a dashboard or another page on success
       })
       .catch((error) => {
         const errorCode = error.code;
+        const errorMessage = error.message;
+
+        // Update the error state based on the error
         if (errorCode === "auth/wrong-password") {
-          // user inputted wrong password
+          setError("Incorrect password. Please try again.");
+        } else if (errorCode === "auth/user-not-found") {
+          setError("No user found with this email. Please sign up.");
+        } else {
+          setError(errorMessage); // Generic error message
         }
       });
   };
 
   return (
     <ThemeProvider theme={theme}>
-      <div className="min-h-[80vh]  flex items-center justify-center">
+      <div className="min-h-[80vh] flex items-center justify-center">
         <div className="p-1 rounded-lg shadow-xl text-white max-w-lg w-full">
           <h2 className="text-yellow-400 text-4xl font-bold mb-6 text-center">
             Log in
           </h2>
           <p className="text-gray-300 text-center mb-8">
-            Welcome back! Please log in to access your account.{" "}
+            Welcome back! Please log in to access your account.
           </p>
-          <form className="space-y-4">
-            <div className="row"></div>
+          <form className="space-y-4" onSubmit={signIn}>
             <div className="row">
               <TextField
                 fullWidth
@@ -83,7 +95,7 @@ function Login() {
                 variant="filled"
                 margin="normal"
                 type="email"
-                style={{ flex: 1, marginRight: "8px" }} // Add some right margin to the first field
+                style={{ flex: 1, marginRight: "8px" }}
                 onChange={(e) => setEmail(e.target.value)}
               />
               <TextField
@@ -96,10 +108,11 @@ function Login() {
                 onChange={(e) => setPassword(e.target.value)}
               />
             </div>
+            {error && <p className="text-red-500 text-center mt-4">{error}</p>}
             <div className="text-center mt-4">
-              <Button color="white" component={Link} to="/sign-up">
+              {/* <Button color="white" component={Link} to="/forgot-password">
                 Forgot Password?
-              </Button>
+              </Button> */}
             </div>
             <Button
               type="submit"
@@ -108,11 +121,9 @@ function Login() {
               color="primary"
               size="large"
               style={{ marginTop: "16px" }}
-              onClick={signIn}
             >
               Login
             </Button>
-
             <div className="text-center mt-4">
               <Button color="white" component={Link} to="/sign-up">
                 Don't have an account? Sign Up

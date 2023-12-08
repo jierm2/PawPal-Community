@@ -1,6 +1,12 @@
-import React, { useState } from 'react';
-import { Button, TextField, ThemeProvider, createTheme, CssBaseline } from '@mui/material';
+import React, { useState, useEffect } from 'react';
+import { Button, TextField, Snackbar, ThemeProvider, createTheme, CssBaseline } from '@mui/material';
+import MuiAlert from '@mui/material/Alert';
+import { EmailAuthProvider, reauthenticateWithCredential } from "firebase/auth";
 
+import { getAuth, updatePassword } from "firebase/auth";
+const Alert = React.forwardRef(function Alert(props, ref) {
+  return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+});
 const theme = createTheme({
   palette: {
     mode: 'dark',
@@ -32,6 +38,62 @@ const theme = createTheme({
 
 function Settings() {
   const [isHovering, setIsHovering] = useState(false);
+  const [userEmail, setUserEmail] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmNewPassword, setConfirmNewPassword] = useState("");
+  const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'info' });
+  const [currentPassword, setCurrentPassword] = useState("");
+
+  const auth = getAuth();
+  useEffect(() => {
+    const user = auth.currentUser;
+    if (user) {
+      setUserEmail(user.email || "");
+    }
+  }, []);
+  const reauthenticate = async (currentPassword) => {
+    const user = auth.currentUser;
+    const credential = EmailAuthProvider.credential(user.email, currentPassword);
+  
+    try {
+      await reauthenticateWithCredential(user, credential);
+      return true;
+    } catch (error) {
+      setSnackbar({ open: true, message: 'Re-authentication failed. Please try again.', severity: 'error' });
+      return false;
+    }
+  };
+  
+  const handlePasswordChange = async () => {
+    if (newPassword !== confirmNewPassword) {
+      setSnackbar({ open: true, message: 'Passwords do not match.', severity: 'error' });
+      return;
+    }
+
+    const user = auth.currentUser;
+    if (user) {
+      try {
+        await updatePassword(user, newPassword);
+        setSnackbar({ open: true, message: 'Password successfully updated.', severity: 'success' });
+      } catch (error) {
+        if (error.code === 'auth/requires-recent-login') {
+          // Call reauthenticate function here
+          const isReauthenticated = await reauthenticate(currentPassword);
+          if (isReauthenticated) {
+            await updatePassword(user, newPassword);
+            setSnackbar({ open: true, message: 'Password successfully updated.', severity: 'success' });
+          }
+        } else {
+          console.error("Error updating password:", error);
+          setSnackbar({ open: true, message: 'Failed to update password. Please try again.', severity: 'error' });
+        }
+      }
+    }
+  };
+
+  const handleCloseSnackbar = () => {
+    setSnackbar({ ...snackbar, open: false });
+  };
 
   return (
     <ThemeProvider theme={theme}>
@@ -65,33 +127,59 @@ function Settings() {
                 fontSize: '1rem',
                 fontWeight: 'bold'
               }}>
-                Change Avatar
+                {/* Change Avatar */}
               </div>
             )}
           </div>
           <div style={{ marginLeft: 16 }}>
             <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#fdd835' }}>Loki Laufeyson</div>
             <div style={{ color: '#aaaaaa' }}>Dog Walker</div>
-            <div style={{ color: '#aaaaaa' }}>Champaign, Illinois</div>
+            <div style={{ color: '#aaaaaa' }}>{userEmail}</div>
           </div>
         </div>
 
-        <form>
-          <TextField label="Email Address" type="email" />
-          <TextField label="Phone Number" type="tel" />
-          <TextField label="Current Password" type="password"  />
+        <form onSubmit={(e) => e.preventDefault()}>
+        <TextField 
+  label="Current Password" 
+  type="password" 
+  value={currentPassword}
+  onChange={(e) => setCurrentPassword(e.target.value)}
+/>
+        <TextField 
+            label="New Password" 
+            type="password" 
+            value={newPassword}
+            onChange={(e) => setNewPassword(e.target.value)}
+            style={{ marginRight: 16 }}
+          />
 
-          <div style={{ display: 'flex' }}>
-          <TextField label="New Password" type="password" style={{ marginRight: 16 }}/>
-
-          <TextField label="Confirm New Password" type="password" />
-          </div>
+          <TextField 
+            label="Confirm New Password" 
+            type="password" 
+            value={confirmNewPassword}
+            onChange={(e) => setConfirmNewPassword(e.target.value)}
+          />
 
           <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 16 }}>
-            {/* <Button variant="outlined" color="primary">Cancel</Button> */}
-            <Button variant="contained" color="primary">Save Changes</Button>
+            <Button 
+              variant="contained" 
+              color="primary" 
+              onClick={handlePasswordChange}
+            >
+              Save Changes
+            </Button>
           </div>
         </form>
+
+        <Snackbar 
+          open={snackbar.open} 
+          autoHideDuration={6000} 
+          onClose={handleCloseSnackbar}
+        >
+          <Alert onClose={handleCloseSnackbar} severity={snackbar.severity}>
+            {snackbar.message}
+          </Alert>
+        </Snackbar>
       </div>
     </ThemeProvider>
   );

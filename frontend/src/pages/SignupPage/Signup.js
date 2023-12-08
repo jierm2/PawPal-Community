@@ -1,11 +1,10 @@
-import React from "react";
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
-import { Link } from "react-router-dom";
-import { auth } from "../../secrets/firebase-secrets";
 import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
-import { useState } from "react";
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 
 const theme = createTheme({
   palette: {
@@ -15,25 +14,23 @@ const theme = createTheme({
     },
   },
   components: {
-    // Name of the component
     MuiTextField: {
       styleOverrides: {
-        // Name of the slot
         root: {
           input: {
-            color: "white", // Text color
+            color: "white",
           },
           "& label": {
-            color: "gray", // Label color
+            color: "gray",
           },
           "& label.Mui-focused": {
-            color: "white", // Label color when the input is focused
+            color: "white",
           },
           "& .MuiInput-underline:before": {
-            borderBottomColor: "gray", // Underline color before input is touched
+            borderBottomColor: "gray",
           },
           "& .MuiInput-underline:after": {
-            borderBottomColor: "white", // Underline color when input is focused
+            borderBottomColor: "white",
           },
         },
       },
@@ -42,27 +39,38 @@ const theme = createTheme({
 });
 
 function Signup() {
+  const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
-
+  const [error, setError] = useState("");
+  const [isSuccess, setIsSuccess] = useState(false); // New state for success animation
   const signUp = (e) => {
     e.preventDefault();
+    setError('');
+    setIsSuccess(false); // Reset success state on new submission
+
+    const auth = getAuth();
     createUserWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
         console.log(userCredential);
+        setIsSuccess(true); // Set success state to true
+        setTimeout(() => navigate('/login'), 2000); // Redirect after 2 seconds
       })
       .catch((error) => {
         const errorCode = error.code;
-        if (errorCode === "auth/email-already-in-use") {
-          // email already exists
-        } else if (errorCode === "auth/invalid-email") {
-          // invalid email
+        const errorMessage = error.message;
+
+        if (errorCode === 'auth/email-already-in-use') {
+          setError('Email already in use. Please try another.');
+        } else if (errorCode === 'auth/invalid-email') {
+          setError('Invalid email format. Please check your email.');
+        } else {
+          setError(errorMessage);
         }
       });
   };
-
   return (
     <ThemeProvider theme={theme}>
       <div className="min-h-[80vh] flex items-center justify-center">
@@ -71,10 +79,9 @@ function Signup() {
             Sign Up
           </h2>
           <p className="text-gray-300 text-center mb-8">
-            Join our community today! Create an account to unlock exclusive
-            features and personalized experiences.
+            Join our community today! Create an account to unlock exclusive features and personalized experiences.
           </p>
-          <form className="space-y-4">
+          <form className="space-y-4" onSubmit={signUp}>
             <div className="row">
               <TextField
                 fullWidth
@@ -123,12 +130,15 @@ function Signup() {
             >
               Sign Up
             </Button>
-            <div className="text-center mt-4">
-              <Button color="primary" component={Link} to="/login">
-                Login
-              </Button>
-            </div>
-          </form>
+            {isSuccess && (
+          <div className="text-center">
+            <CheckCircleIcon style={{ fontSize: 60, color: 'green' }} />
+            <p>Registration Successful!</p>
+          </div>
+        )}
+
+        {error && <p className="text-red-500 text-center mt-4">{error}</p>}
+      </form>
         </div>
       </div>
     </ThemeProvider>
