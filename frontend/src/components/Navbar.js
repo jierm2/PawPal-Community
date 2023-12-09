@@ -168,11 +168,19 @@ const Navbar = () => {
               </NavLink>
             </>
           )}
-          {currentUser && (
-            <NavLink onClick={handleLogout}>
-              Logout
-            </NavLink>
-          )}
+{currentUser && (
+  <>
+      <NavLink to="/settings">
+      Settings
+    </NavLink>
+    <NavLink onClick={handleLogout}>
+      Logout
+    </NavLink>
+
+
+  </>
+)}
+
         </NavMenu>
         <DropdownMenu isOpen={isOpen}>
           <DropdownItem to='/mission' onClick={closeMenu}>

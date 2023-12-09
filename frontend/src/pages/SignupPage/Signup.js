@@ -42,35 +42,45 @@ function Signup() {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
+  const [Name, setName] = useState("");
   const [error, setError] = useState("");
   const [isSuccess, setIsSuccess] = useState(false); // New state for success animation
-  const signUp = (e) => {
+  const signUp = async(e) => {
     e.preventDefault();
     setError('');
     setIsSuccess(false); // Reset success state on new submission
 
     const auth = getAuth();
-    createUserWithEmailAndPassword(auth, email, password)
-      .then((userCredential) => {
-        console.log(userCredential);
-        setIsSuccess(true); // Set success state to true
-        setTimeout(() => navigate('/login'), 2000); // Redirect after 2 seconds
-      })
-      .catch((error) => {
-        const errorCode = error.code;
-        const errorMessage = error.message;
+    try {
+      createUserWithEmailAndPassword(auth, email, password)
 
-        if (errorCode === 'auth/email-already-in-use') {
-          setError('Email already in use. Please try another.');
-        } else if (errorCode === 'auth/invalid-email') {
-          setError('Invalid email format. Please check your email.');
-        } else {
-          setError(errorMessage);
-        }
+      const response = await fetch('http://localhost:9001/api/users', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({name: Name,email:email,}),
       });
+      setIsSuccess(true); // Set success state to true
+      setTimeout(() => navigate('/login'), 2000); // Redirect after 2 seconds
+      console.log(response)
+    } catch (error) {
+      console.log("we have an error", error)
+      const errorCode = error.code;
+      const errorMessage = error.message;
+
+      if (errorCode === 'auth/email-already-in-use') {
+        setError('Email already in use. Please try another.');
+      } else if (errorCode === 'auth/invalid-email') {
+        setError('Invalid email format. Please check your email.');
+      } else {
+        setError(errorMessage);
+      }
+    }
+    
+
+      
   };
+
+
   return (
     <ThemeProvider theme={theme}>
       <div className="min-h-[80vh] flex items-center justify-center">
@@ -85,20 +95,13 @@ function Signup() {
             <div className="row">
               <TextField
                 fullWidth
-                label="Enter First Name"
+                label="Enter Your Name"
                 variant="filled"
                 margin="normal"
                 style={{ flex: 1, marginRight: "8px" }}
-                onChange={(e) => setFirstName(e.target.value)}
+                onChange={(e) => setName(e.target.value)}
               />
-              <TextField
-                fullWidth
-                label="Enter Last Name"
-                variant="filled"
-                margin="normal"
-                style={{ flex: 1 }}
-                onChange={(e) => setLastName(e.target.value)}
-              />
+
             </div>
             <div className="row">
               <TextField
