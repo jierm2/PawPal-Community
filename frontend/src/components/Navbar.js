@@ -157,9 +157,7 @@ const Navbar = () => {
           <NavLink to='/services' onClick={closeMenu}>
             Services
           </NavLink>
-          <NavLink to='/walker' onClick={closeMenu}>
-            Find a Walker
-          </NavLink>
+
           {!currentUser && (
             <>
 
@@ -169,7 +167,9 @@ const Navbar = () => {
             </>
           )}
 {currentUser && (
-  <>
+  <>          <NavLink to='/walker' onClick={closeMenu}>
+  Find a Walker
+</NavLink>
       <NavLink to="/settings">
       Settings
     </NavLink>
@@ -189,9 +189,7 @@ const Navbar = () => {
           <DropdownItem to='/services' onClick={closeMenu}>
             Services
           </DropdownItem>
-          <DropdownItem to='/walker' onClick={closeMenu}>
-            Become a Walker
-          </DropdownItem>
+
           {!currentUser && (
             <>
               <DropdownItem to='/login' onClick={closeMenu}>
@@ -203,9 +201,15 @@ const Navbar = () => {
             </>
           )}
           {currentUser && (
-            <DropdownItem onClick={handleLogout}>
+            <>
+                      <DropdownItem to='/walker' onClick={closeMenu}>
+            Become a Walker
+          </DropdownItem>
+          <DropdownItem onClick={handleLogout}>
               Logout
             </DropdownItem>
+          </>
+
           )}
         </DropdownMenu>
         {!currentUser && (
