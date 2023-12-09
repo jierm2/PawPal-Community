@@ -5,7 +5,7 @@ function Home(props) {
   return (
     <form className="items-center flex flex-col justify-center px-16 py-11 max-md:px-5">
   <Topsection/>
-<Midservices/>
+{/* <Midservices/> */}
     </form>
 
 

@@ -10,15 +10,15 @@ import PeopleIcon from '@mui/icons-material/People';
 
 
 function ServiceItem({ IconComponent, title, description }) {
-    return (
-      <div className="service-item">
-        <div className="service-icon">
-          <IconComponent fontSize="large" />
-        </div>
-        <h3 className="text-amber-400">{title}</h3>
-        <p className="smaller-text">{description}</p>
+  return (
+    <div className="service-item ">
+      <div className="service-icon text-center mb-4">
+        <IconComponent fontSize="large"  />
       </div>
-    );
+      <h3 className="text-amber-400 text-lg font-semibold mb-2">{title}</h3>
+      <p className="text-sm leading-snug mt-2 mb-2">{description}</p>
+    </div>
+  );
 }
 
 function Services(props) {
@@ -31,8 +31,8 @@ function Services(props) {
         { IconComponent: StoreIcon, title: "Support for Local Pet Businesses", description: "Discover and support local businesses. Use your credits for discounts on goods and services that make your pet's life better." }
       ];
     return (    
-    <div className="self-stretch text-amber-400 text-3xl font-medium leading-[58px] mt-5 max-md:max-w-full">
-    <div>
+      <div className="self-stretch text-amber-400 text-3xl font-medium leading-[58px] mt-5 max-md:max-w-full px-8 md:px-16">
+      <div>
       <div className="text-center text-amber-400 text-4xl font-medium leading-normal mt-20 mb-12">
         <span className="text-white">Our </span>
         <span>Services</span>

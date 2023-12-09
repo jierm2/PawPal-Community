@@ -30,7 +30,7 @@ function Midservices() {
 
   return (
     <div>
-      <div className="text-center text-amber-400 text-4xl font-medium leading-normal mt-20 mb-12">
+      <div className="text-center text-amber-400 text-4xl font-medium leading-normal mt-20 mb-12 oad">
         <span className="text-white">Our </span>
         <span>Services</span>
       </div>

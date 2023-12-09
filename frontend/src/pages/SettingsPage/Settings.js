@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Button, TextField, Snackbar, ThemeProvider, createTheme, CssBaseline } from '@mui/material';
 import MuiAlert from '@mui/material/Alert';
 import { EmailAuthProvider, reauthenticateWithCredential } from "firebase/auth";
-
+import { useAuth } from '../../auth';
 import { getAuth, updatePassword } from "firebase/auth";
 const Alert = React.forwardRef(function Alert(props, ref) {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
@@ -43,6 +43,7 @@ function Settings() {
   const [confirmNewPassword, setConfirmNewPassword] = useState("");
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'info' });
   const [currentPassword, setCurrentPassword] = useState("");
+  const { currentUser, mongoDBUser } = useAuth();
 
   const auth = getAuth();
   useEffect(() => {
@@ -51,6 +52,11 @@ function Settings() {
       setUserEmail(user.email || "");
     }
   }, []);
+  if (!mongoDBUser) {
+    return <div>Loading...</div>; // or handle the loading state as you prefer
+  }
+  const userName = mongoDBUser.name; 
+
   const reauthenticate = async (currentPassword) => {
     const user = auth.currentUser;
     const credential = EmailAuthProvider.credential(user.email, currentPassword);
@@ -84,7 +90,6 @@ function Settings() {
             setSnackbar({ open: true, message: 'Password successfully updated.', severity: 'success' });
           }
         } else {
-          console.error("Error updating password:", error);
           setSnackbar({ open: true, message: 'Failed to update password. Please try again.', severity: 'error' });
         }
       }
@@ -132,8 +137,7 @@ function Settings() {
             )}
           </div>
           <div style={{ marginLeft: 16 }}>
-            <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#fdd835' }}>Loki Laufeyson</div>
-            <div style={{ color: '#aaaaaa' }}>Dog Walker</div>
+            <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#fdd835' }}>{userName}</div>
             <div style={{ color: '#aaaaaa' }}>{userEmail}</div>
           </div>
         </div>

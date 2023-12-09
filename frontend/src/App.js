@@ -12,7 +12,7 @@ import Footer from "./components/Footer";
 import Settings from "./pages/SettingsPage/Settings";
 import { Box } from '@mui/material';
 import { AuthProvider } from "./auth";
-
+import Find from "./pages/FindPage/Find";
 import ProtectedRoute from "./util/ProtectRoute";
 import PublicRoute from "./util/PublicRoute";
 
@@ -38,6 +38,9 @@ function App() {
         <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
         <Route path="/sign-up" element={<PublicRoute><Signup /></PublicRoute>} />
         <Route path="/walker" element={<ProtectedRoute><Walker /></ProtectedRoute>} />
+        <Route path="/walker" element={<ProtectedRoute><Walker /></ProtectedRoute>} />
+        <Route path="/search" element={<ProtectedRoute><Find /></ProtectedRoute>} />
+
         <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
 
       </Routes>

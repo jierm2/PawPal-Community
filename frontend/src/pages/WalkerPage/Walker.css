@@ -7,3 +7,9 @@
     border: 1px solid #0a0909;
     border-radius: 8px;
   }
+  /* Walker.css */
+
+/* This targets the SVG icon within the TextField and sets its color to white */
+.MuiInputAdornment-positionEnd {
+  color: white;
+}
