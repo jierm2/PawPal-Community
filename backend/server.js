@@ -5,10 +5,13 @@ var { ObjectId } = require("mongoose");
 var mongoSecrets = require("./secrets/mongo-secrets.js");
 var User = require("./models/user.js");
 var Task = require("./models/task.js");
+var cors = require("cors");
 
 const PORT = 9001;
 
 const app = express();
+
+app.use(cors());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
