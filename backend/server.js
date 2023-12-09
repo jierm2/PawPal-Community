@@ -73,10 +73,10 @@ app.post("/api/users", async (req, res) => {
     // console.log(req.body);
     var userData = req.body;
 
-    if (!userData.hasOwnProperty("name") || !userData.hasOwnProperty("email") || !userData.hasOwnProperty("location")) {
+    if (!userData.hasOwnProperty("name") || !userData.hasOwnProperty("email")) {
       res.status(500).send({
-        message: "User must have a name, location and an email",
-        data: "User must have a name, location and an email",
+        message: "User must have a name and an email",
+        data: "User must have a name and an email",
       });
       return;
     }
@@ -294,10 +294,6 @@ app.post("/api/tasks", async (req, res) => {
     const newTask = new Task(taskData);
     newTask.save();
 
-    // owner.tasks.push(newTask._id);
-    // owner.save();
-    // console.log(bob);
-
     res.status(201).send({ message: "OK", data: newTask });
   } catch (err) {
     res
@@ -324,25 +320,6 @@ app.delete("/api/tasks/:id", async (req, res) => {
       });
       return;
     }
-    // if (task.ownerID !== "deleted") {
-    //   let owner = await User.findOne({_id: task.ownerID});
-    //   console.log(owner);
-    //   owner.tasks = owner.tasks.filter((element) => {return element !== req.params.id});
-    //   await owner.save();
-    // }
-
-    // if (!(task.assignedWalker in ["unassigned", "deleted"])) {
-    //   let assignedWalker = await User.findOne({_id: task.assignedWalker});
-    //   assignedWalker.assignedTasks = assignedWalker.assignedTasks.filter((element) => {return element !== req.params.id});
-    //   await assignedWalker.save();
-    // }
-
-    // let pendingWalkers = await User.find({_id: {$in: task.pendingWalkers}});
-    // for (pendingWalker of pendingWalkers) {
-    //   pendingWalker.pendingTasks = pendingWalker.pendingTasks.filter((element) => {return element !== req.params.id});
-    //   pendingWalker.assignedTasks = pendingWalker.assignedTasks.filter((element) => {return element !== req.params.id});
-    //   await pendingWalker.save();
-    // }
 
     await Task.deleteOne({_id: task._id});
     res.status(200).send({
@@ -419,8 +396,6 @@ app.put("/api/tasks/:id", async (req, res) => {
           });
           return;
         }
-        // assignedWalker.assignedTasks = assignedWalker.assignedTasks.filter((element) => {return element !== task._id});
-        // assignedWalker.completedTasks = assignedWalker.completedTasks + [task._id];
       }
     }
 
@@ -440,14 +415,6 @@ app.put("/api/tasks/:id", async (req, res) => {
         });
         return;
       }
-      // assignedWalker.assignedTasks = assignedWalker.assignedTasks + [task._id];
-      // await assignedWalker.save();
-      // let pendingWalkers = await User.find({_id: {$in: task.pendingWalkers}});
-      // for (pendingWalker of pendingWalkers) {
-      //   pendingWalker.pendingTasks = pendingWalker.pendingTasks.filter((element) => {return element !== req.params.id});
-      //   pendingWalker.assignedTasks = pendingWalker.assignedTasks.filter((element) => {return element !== req.params.id});
-      //   await pendingWalker.save();
-      // }
     }
 
     const updatedTask = await Task.findOneAndUpdate({_id: task._id}, taskData);
