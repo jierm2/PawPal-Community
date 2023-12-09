@@ -2,9 +2,8 @@ import React, { useState } from 'react';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
-// import { Link } from 'react-router-dom';
 import "./Walker.css"
-
+import { useAuth } from '../../auth';
 const theme = createTheme({
   palette: {
     mode: 'dark',
@@ -13,29 +12,32 @@ const theme = createTheme({
     },
   },
   components: {
-    // Name of the component
     MuiTextField: {
       styleOverrides: {
-        // Name of the slot
+
         root: {
           input: {
-            color: 'white', // Text color
+            color: 'white',
           },
           '& label': {
-            color: 'gray', // Label color
+            color: 'gray',
           },
           '& label.Mui-focused': {
-            color: 'white', // Label color when the input is focused
+            color: 'white', 
           },
           '& .MuiInput-underline:before': {
-            borderBottomColor: 'gray', // Underline color before input is touched
+            borderBottomColor: 'gray', 
           },
           '& .MuiInput-underline:after': {
-            borderBottomColor: 'white', // Underline color when input is focused
+            borderBottomColor: 'white',
           },
         },
       },
+      
+      
     },
+    
+    
   },
 });
 
@@ -58,7 +60,6 @@ function DropdownExample() {
         <option value="Four dogs">4</option>
       </select>
 
-      {/* <p className="text-gray-300 text-center mb-8">Selected Number: {selectedOption}</p> */}
     </div>
   );
 }
@@ -85,15 +86,72 @@ function DropdownExample2() {
         <option value="100">100+</option>
       </select>
 
-      {/* <p className="text-gray-300 text-center mb-8">Selected Number: {selectedOption}</p> */}
     </div>
   );
 }
 
 
 function Walker() {
+  const { mongoDBUser } = useAuth();
+  const navigate = useNavigate();
+  const [formData, setFormData] = useState({
+    date: '',
+    duration: '',
+    numberOfDogs: '',
+    sizeOfDogs: [],
+    location: []
+  });
+
+  const handleInputChange = (event) => {
+    const { name, value } = event.target;
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      [name]: value
+    }));
+  };
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    if (!mongoDBUser) {
+      console.error('No ownerID found. User must be logged in.');
+      return;
+    }
+
+    const taskData = {
+      ...formData,
+      ownerID: mongoDBUser._id, 
+    };
+
+    try {
+      const response = await fetch('http://localhost:9001/api/tasks', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(taskData)
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const result = await response.json();
+      console.log('Task Created:', result);
+      navigate('/some-success-page')
+    } catch (error) {
+      console.error('Failed to create task:', error);
+    }
+  };
+  const [selectedDate, setSelectedDate] = useState('');
+  
+  // Calculate today's date in the correct format for the min attribute
+  const today = new Date().toISOString().split('T')[0];
+
+  const handleDateChange = (event) => {
+    setSelectedDate(event.target.value);
+  };
+
   return (
-    // <div className="self-stretch text-amber-400 text-3xl font-medium leading-[58px] mt-5 max-md:max-w-full">
     <ThemeProvider theme={theme}>
       <h2 className="text-yellow-400 text-4xl font-bold mb-6 text-center">Find The Perfect Match For Your Dog's Needs</h2>
     <div className="min-h-[80vh] flex items-center justify-center">
@@ -113,14 +171,25 @@ function Walker() {
                 margin="normal"
                 style={{ flex: 1, marginRight: '8px' }}
               />
+             <TextField
+             name='date'
+          fullWidth
+          label="Enter Date for Sitting"
+          type="date"
+          variant="filled"
+          margin="normal"
+          InputLabelProps={{
+            shrink: true,
+          }}
+          inputProps={{
+            min: today, 
+          }}
+          value={selectedDate}
+          onChange={handleDateChange}
+          style={{ flex: 1, marginRight: '8px' }}
+        />
               <TextField
-                fullWidth
-                label="Enter Date for Sitting"
-                variant="filled"
-                margin="normal"
-                style={{ flex: 1, marginRight: '8px' }}
-              />
-              <TextField
+               name="duration" 
                 fullWidth
                 label="Enter Time Range for Sitting (hours)"
                 variant="filled"
@@ -131,7 +200,7 @@ function Walker() {
             <DropdownExample /> 
             <DropdownExample2 /> 
             <Button
-              type="Search"
+              type="submit"
               fullWidth
               variant="contained"
               color="primary"
@@ -144,7 +213,6 @@ function Walker() {
         </div>
       </div>
       </ThemeProvider>
-    // </div>
     );
 }
 

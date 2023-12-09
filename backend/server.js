@@ -18,7 +18,7 @@ app.use(bodyParser.json());
 mongoose.connect(mongoSecrets.mongo_connection, { useNewUrlParser: true });
 const db = mongoose.connection;
 
-app.get("/api/users", async (req, res) => {
+app.get("/api/user", async (req, res) => {
   try {
     var where = req.query.where ? JSON.parse(req.query.where) : {};
     var sort = req.query.sort;
@@ -46,6 +46,27 @@ app.get("/api/users", async (req, res) => {
   }
 });
 
+
+
+app.get("/api/users", async (req, res) => {
+  try {
+    const email = req.query.email; // Express automatically decodes this
+    if (!email) {
+      return res.status(400).send({ message: "Email query parameter is required." });
+    }
+
+    const user = await User.findOne({ email: email });
+    if (!user) {
+      return res.status(404).send({ message: "User not found" });
+    }
+
+    res.status(200).send({ message: "OK", data: user });
+  } catch (err) {
+    res.status(500).send({ message: "Internal server error", data: err.message });
+  }
+});
+
+
 app.get("/api/users/:id", async (req, res) => {
   try {
     var select = req.query.select ? JSON.parse(req.query.select) : {};
@@ -70,6 +91,8 @@ app.get("/api/users/:id", async (req, res) => {
       .json({ message: "Internal server error", data: err.message });
   }
 });
+
+
 
 app.post("/api/users", async (req, res) => {
   try {

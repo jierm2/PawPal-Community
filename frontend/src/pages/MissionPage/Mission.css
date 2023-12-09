@@ -3,6 +3,7 @@
     flex-direction: row;
     justify-content: center;
     width: 100%;
+    
   }
   
   .about-page-desktop .div {
@@ -11,6 +12,7 @@
     overflow: hidden;
     position: relative;
     width: 1920px;
+    
   }
   
   .about-page-desktop .container {
@@ -23,6 +25,7 @@
     position: absolute;
     top: 50px;
     width: 1599px;
+    
   }
   
   .about-page-desktop .sub-container {
@@ -101,3 +104,4 @@
     top: 50px;
   }
   
+

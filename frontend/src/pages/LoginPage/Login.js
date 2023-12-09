@@ -59,24 +59,30 @@ function Login() {
     const auth = getAuth();
     signInWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
-        console.log(userCredential);
-        navigate("/settings"); // Redirect to a dashboard or another page on success
+        // Firebase sign-in was successful
+  
+        // Fetch user data from your MongoDB API
+        fetch(`http://localhost:9001/api/users?email=${encodeURIComponent(email)}`)
+          .then(response => {
+            if (!response.ok) {
+              throw new Error('Failed to fetch user data from MongoDB');
+            }
+            return response.json();
+          })
+          .then(userData => {
+            // console.log('MongoDB User Data:', userData);
+            navigate("/settings"); 
+          })
+          .catch(err => {
+            // console.error('Error fetching user data:', err);
+            setError('Failed to retrieve user data.');
+          });
       })
       .catch((error) => {
-        const errorCode = error.code;
-        const errorMessage = error.message;
-
-        // Update the error state based on the error
-        if (errorCode === "auth/wrong-password") {
-          setError("Incorrect password. Please try again.");
-        } else if (errorCode === "auth/user-not-found") {
-          setError("No user found with this email. Please sign up.");
-        } else {
-          setError(errorMessage); // Generic error message
-        }
+        setError("Email or password is incorrect, please try it again");
       });
   };
-
+  
   return (
     <ThemeProvider theme={theme}>
       <div className="min-h-[80vh] flex items-center justify-center">

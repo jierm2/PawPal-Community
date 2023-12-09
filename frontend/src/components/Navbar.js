@@ -167,9 +167,14 @@ const Navbar = () => {
             </>
           )}
 {currentUser && (
-  <>          <NavLink to='/walker' onClick={closeMenu}>
+  <>         
+   <NavLink to='/search' onClick={closeMenu}>
+  Forum
+</NavLink>
+ <NavLink to='/walker' onClick={closeMenu}>
   Find a Walker
 </NavLink>
+
       <NavLink to="/settings">
       Settings
     </NavLink>
@@ -202,6 +207,9 @@ const Navbar = () => {
           )}
           {currentUser && (
             <>
+                                  <DropdownItem to='/search' onClick={closeMenu}>
+            Forum
+          </DropdownItem>
                       <DropdownItem to='/walker' onClick={closeMenu}>
             Become a Walker
           </DropdownItem>
