@@ -1,15 +1,20 @@
 .custom-dropdown {
-    position: relative;
-    width: 505px; /* Set your preferred width */
-    height: 50px;
-    background-color: #C0C0C0; /* Set the background color to gray */
-    padding: 10px;
-    border: 1px solid #0a0909;
-    border-radius: 8px;
-  }
-  /* Walker.css */
+  position: relative;
+  width: 505px; /* Set your preferred width */
+  height: 50px;
+  background-color: rgba(255, 255, 255, 0.1); /* Set the background color to gray */
+  padding: 10px;
+  /* border: 1px solid #0a0909; */
+  border-bottom: 1px solid rgb(242, 238, 238);
+  border-radius: 8px;
+}
+/* Walker.css */
 
 /* This targets the SVG icon within the TextField and sets its color to white */
 .MuiInputAdornment-positionEnd {
-  color: white;
+color: white;
+}
+
+.testtext {
+size: 15px;
 }

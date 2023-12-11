@@ -51,14 +51,13 @@ function DropdownExample() {
 
   return (
     <div>
-      <label className="text-gray-300 text-center mb-8" htmlFor="number">How many dogs?</label>
+      <label className="text-gray-300 text-center mb-8" htmlFor="number">How many dogs? (Max 3 dogs per post) </label>
       <br></br>
-            <select className=" custom-dropdown text-white text-center mb-8" id="number" value={selectedOption} onChange={handleDropdownChange}>
+        <select className=" custom-dropdown text-white text-center mb-8" id="number" value={selectedOption} onChange={handleDropdownChange}>
         <option value="">-- Please Select Amount --</option>
         <option value="One dog">1</option>
         <option value="Two dogs">2</option>
         <option value="Three dogs">3</option>
-        <option value="Four dogs">4</option>
       </select>
 
     </div>
@@ -66,30 +65,30 @@ function DropdownExample() {
 }
 
 
-function DropdownExample2() {
-  const [selectedOption, setSelectedOption] = useState('');
+// function DropdownExample2() {
+//   const [selectedOption, setSelectedOption] = useState('');
 
-  const handleDropdownChange = (event) => {
-    setSelectedOption(event.target.value);
-  };
+//   const handleDropdownChange = (event) => {
+//     setSelectedOption(event.target.value);
+//   };
 
-  return (
-    <div>
-      <label className="text-gray-300 text-center mb-8" htmlFor="weight">Dog Weight (lbs)</label>
-      <br></br>
-      <select className=" custom-dropdown text-white text-center mb-8" id="weight" value={selectedOption} onChange={handleDropdownChange}>
-        <option value="">-- Please Select Weight --</option>
-        <option value="1-15">1 - 15</option>
-        <option value="16">16 - 30</option>
-        <option value="31">31 - 50</option>
-        <option value="51">51- 70</option>
-        <option value="71">71 - 100</option>
-        <option value="100">100+</option>
-      </select>
+//   return (
+//     <div>
+//       <label className="text-gray-300 text-center mb-8" htmlFor="weight">Dog Weight (lbs)</label>
+//       <br></br>
+//       <select className=" custom-dropdown text-white text-center mb-8" id="weight" value={selectedOption} onChange={handleDropdownChange}>
+//         <option value="">-- Please Select Weight --</option>
+//         <option value="1-15">1 - 15</option>
+//         <option value="16">16 - 30</option>
+//         <option value="31">31 - 50</option>
+//         <option value="51">51- 70</option>
+//         <option value="71">71 - 100</option>
+//         <option value="100">100+</option>
+//       </select>
 
-    </div>
-  );
-}
+//     </div>
+//   );
+// }
 
 
 function Walker() {
@@ -197,9 +196,18 @@ function Walker() {
                 margin="normal"
                 style={{ flex: 1, marginRight: '8px' }}
               />
-            </div>
+            <br></br>
+            <br></br>
             <DropdownExample /> 
-            <DropdownExample2 /> 
+            {/* <DropdownExample2 />  */}
+              <TextField
+                fullWidth
+                label="Enter the Weight of Each Dog in lbs (separated by commas)"
+                variant="filled"
+                margin="normal"
+                style={{ flex: 1, marginRight: '8px' }}
+              />
+              </div>
             <Button
               type="submit"
               fullWidth
