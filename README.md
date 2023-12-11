@@ -1,6 +1,7 @@
 # PawPal-Community
 
 Team Name: Works On My Machine
+
 Team Members: Jimmy Miao (Jierm2), Jason Barnett (jasoneb3), Saran Lock (saranl2), Aamina Ali (aali220)
 
 
