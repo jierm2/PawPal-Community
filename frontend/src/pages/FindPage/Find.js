@@ -63,10 +63,10 @@ function Find() {
         <Grid item xs={12}>
           <Button
             variant="contained"
-            color="secondary"
+            color="primary"
             onClick={() => navigate('/walker')}
           >
-            Create Task
+            Post New Task
           </Button>
         </Grid>
         {tasks.map((task) => (
