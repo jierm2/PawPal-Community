@@ -38,7 +38,6 @@ function App() {
         <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
         <Route path="/sign-up" element={<PublicRoute><Signup /></PublicRoute>} />
         <Route path="/walker" element={<ProtectedRoute><Walker /></ProtectedRoute>} />
-        <Route path="/walker" element={<ProtectedRoute><Walker /></ProtectedRoute>} />
         <Route path="/search" element={<ProtectedRoute><Find /></ProtectedRoute>} />
 
         <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />

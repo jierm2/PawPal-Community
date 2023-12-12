@@ -25,7 +25,7 @@ function Mission(props) {
               care excellence.
             </p>
           </div>
-          <img className="image" alt="multicolor dog mission" src={hello}/>
+          <img className="image" alt="multicolor dog mission" src={hello} style={{ width: '100%' }}/>
         </div>
     </div>
     </div>
