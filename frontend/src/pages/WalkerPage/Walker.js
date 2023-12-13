@@ -150,7 +150,7 @@ function Walker() {
     };
     // console.log('taskdata',taskData);
     try {
-      const response = await fetch('http://localhost:9001/api/tasks', {
+      const response = await fetch('/api/tasks', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

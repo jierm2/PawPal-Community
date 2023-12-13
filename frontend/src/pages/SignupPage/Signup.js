@@ -65,7 +65,7 @@ function Signup() {
       await signOut(auth);
   
       // Step 3: Attempt to save data to MongoDB
-      const response = await fetch('http://localhost:9001/api/users', {
+      const response = await fetch('/api/users', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name: Name, email: email }),

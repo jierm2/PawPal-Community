@@ -85,7 +85,7 @@ function Find() {
       let walkersData = {};
   
       for (const walkerId of uniqueWalkerIds) {
-        const response = await fetch(`http://localhost:9001/api/users/${walkerId}`);
+        const response = await fetch(`/api/users/${walkerId}`);
         const data = await response.json();
         
         // Assuming the response contains walker data
@@ -104,7 +104,7 @@ function Find() {
   // Function to handle walker selection
   const handleSelectWalker = async (taskId, walkerId) => {
     try {
-      const response = await fetch(`http://localhost:9001/api/tasks/${taskId}`, {
+      const response = await fetch(`/api/tasks/${taskId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -153,7 +153,7 @@ function Find() {
   const [alert, setAlert] = useState({ message: '', type: 'info', open: false });
 
   useEffect(() => {
-    fetch('http://localhost:9001/api/tasks')
+    fetch('/api/tasks')
       .then((response) => response.json())
       .then((data) => {
         const currentDate = new Date();
@@ -175,7 +175,7 @@ function Find() {
   const handleDeleteTask = (taskId) => {
   
     // Send a DELETE request to the API endpoint for deleting the task
-    fetch(`http://localhost:9001/api/tasks/${taskId}`, {
+    fetch(`/api/tasks/${taskId}`, {
       method: 'DELETE',
     })
       .then((response) => {
@@ -206,7 +206,7 @@ function Find() {
         return; // Skip fetching when ownerId is "deleted"
       }
 
-      fetch(`http://localhost:9001/api/users/${ownerId}`)
+      fetch(`/api/users/${ownerId}`)
         .then((response) => response.json())
         .then((data) => {
           // Store owner's information by their ID

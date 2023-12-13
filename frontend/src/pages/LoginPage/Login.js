@@ -62,7 +62,7 @@ function Login() {
         // Firebase sign-in was successful
   
         // Fetch user data from your MongoDB API
-        fetch(`http://localhost:9001/api/users?email=${encodeURIComponent(email)}`)
+        fetch(`/api/users?email=${encodeURIComponent(email)}`)
           .then(response => {
             if (!response.ok) {
               throw new Error('Failed to fetch user data from MongoDB');

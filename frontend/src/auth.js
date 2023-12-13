@@ -20,7 +20,7 @@ export function AuthProvider({ children }) {
         // Fetch MongoDB user data using the email
         try {
           const email = encodeURIComponent(user.email);
-          const response = await fetch(`http://localhost:9001/api/users?email=${email}`);
+          const response = await fetch(`/api/users?email=${email}`);
           const userData = await response.json();
           setMongoDBUser(userData.data); // Adjust this based on your API response
         } catch (error) {
