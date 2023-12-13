@@ -130,7 +130,7 @@ function Walker() {
       return;
     }
     if (!mongoDBUser) {
-      console.error('No ownerID found. User must be logged in.');
+      // console.error('No ownerID found. User must be logged in.');
       return;
     }
 
@@ -148,7 +148,7 @@ function Walker() {
       ownerID: mongoDBUser._id,
       sizeOfDogs: dogSizes
     };
-    console.log('taskdata',taskData);
+    // console.log('taskdata',taskData);
     try {
       const response = await fetch('http://localhost:9001/api/tasks', {
         method: 'POST',
@@ -163,14 +163,14 @@ function Walker() {
       }
 
       const result = await response.json();
-      console.log('Task Created:', result);
+      // console.log('Task Created:', result);
       setIsSuccess(true); // Set success state to true
       setSuccessMessage('Form submitted successfully'); // Set success message
       setTimeout(() => {
         navigate('/search');
       }, 1000);
     } catch (error) {
-      console.error('Failed to create task:', error);
+      // console.error('Failed to create task:', error);
       setErrorMessage('Failed to submit form'); // Set error message
 
     }

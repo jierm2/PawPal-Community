@@ -1,35 +1,43 @@
-import * as React from "react";
+import React from 'react';
+import { Grid, Typography, Box, Card, CardContent, useTheme, useMediaQuery } from '@mui/material';
+import PetsIcon from '@mui/icons-material/Pets';
 import hello from '../../images/dogMission.png'; 
-import "./Mission.css"
 
 function Mission(props) {
-  return (    
-    <div className="self-stretch text-amber-400 text-3xl font-medium leading-[58px] mt-5 max-md:max-w-full"> 
-      {/* <span className="text-white"> hello.</span> */}
-      <div className="about-page-desktop">
-      <div className="div">
-        <div className="container">
-          <div className="sub-container">
-            <div className="text-container">
-              <div className="text">Welcome to PawPal Community.</div>
-              <p className="heading">
-                <span className="text-wrapper">Where Pet Care Meets </span>
-                <span className="span">Compassion!</span>
-              </p>
-            </div>
-            <p className="paragraph">
-              At PawPal Community, we believe that every dog deserves love and every dog lover should have the chance to
-              share their affection. As a trusted companion for your pet care needs, we are committed to delivering
-              exceptional services that go beyond expectations. We offer a unique platform, building connections and
-              enriching lives, both human and canine. Join us on this exciting journey and discover a new level of pet
-              care excellence.
-            </p>
-          </div>
-          <img className="image" alt="multicolor dog mission" src={hello} style={{ width: '100%' }}/>
-        </div>
-    </div>
-    </div>
-    </div>
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+
+  return (
+    <Grid container spacing={5} alignItems="center">
+      <Grid item xs={12} md={6}>
+        <Card sx={{ minHeight: 250, display: 'flex', flexDirection: 'column', justifyContent: 'center', backgroundColor: 'grey.900', boxShadow: 5 }}>
+          <CardContent>
+            <Typography gutterBottom variant="h4" component="div" sx={{ color: 'common.white' }}>
+              Welcome to PawPal Community
+              <PetsIcon sx={{ fontSize: 40, verticalAlign: 'bottom', marginLeft: 1, color: 'warning.main' }} />
+            </Typography>
+            <Typography variant="h5" color="textSecondary" component="p" sx={{ color: 'grey.500' }}>
+              Where Pet Care Meets Compassion!
+            </Typography>
+            <Typography variant="body1" component="p" sx={{ marginTop: 2, color: 'grey.300' }}>
+              At PawPal Community, we believe that every dog deserves love and every dog lover should have the chance to share their affection. As a trusted companion for your pet care needs, we are committed to delivering exceptional services that go beyond expectations. We offer a unique platform, building connections and enriching lives, both human and canine. Join us on this exciting journey and discover a new level of pet care excellence.
+            </Typography>
+          </CardContent>
+        </Card>
+      </Grid>
+      <Grid item xs={12} md={6}>
+        <Box
+          component="img"
+          sx={{
+            height: 'auto',
+            width: '100%',
+            borderRadius: isMobile ? 0 : theme.shape.borderRadius,
+          }}
+          alt="multicolor dog mission"
+          src={hello}
+        />
+      </Grid>
+    </Grid>
   );
 }
 

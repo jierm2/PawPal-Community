@@ -54,7 +54,7 @@ function Settings() {
       await signOut(getAuth());
       navigate('/login');
     } catch (error) {
-      console.error("Error signing out: ", error);
+      // console.error("Error signing out: ", error);
     }
   };
   
@@ -68,9 +68,9 @@ function Settings() {
 
     if (mongoDBUser) {
       setLoading(false); // Set loading to false when mongoDBUser is available
-      console.log('MongoDB user data ava')
+      // console.log('MongoDB user data ava')
     } else {
-      console.log("Waiting for MongoDB user data...");
+      // console.log("Waiting for MongoDB user data...");
       
     }
   }, [mongoDBUser]);
@@ -134,7 +134,7 @@ function Settings() {
             style={{ position: 'relative', cursor: 'pointer' }}
             onMouseEnter={() => setIsHovering(true)}
             onMouseLeave={() => setIsHovering(false)}
-            onClick={() => console.log('Profile image clicked')}
+            // onClick={() => console.log('Profile image clicked')}
           >
             <img
               src="https://m.media-amazon.com/images/M/MV5BYzhjNmVhMTctYjc1OC00ZDYxLTgwZDEtYmEyNjJhOTdhZDNjXkEyXkFqcGdeQXVyNjczOTE0MzM@._V1_.jpg" 

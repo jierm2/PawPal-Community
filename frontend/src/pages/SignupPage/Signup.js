@@ -81,7 +81,7 @@ function Signup() {
       setIsSuccess(true); // Set success state to true
       setTimeout(() => navigate('/login'), 2000); // Redirect after 2 seconds
     } catch (error) {
-      console.error("Error: ", error.code);
+      // console.error("Error: ", error.code);
       // console.error("Error: ", error.message);
 
       setError(error.message);

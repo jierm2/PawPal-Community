@@ -21,7 +21,7 @@ const Navbar = () => {
   const navRef = useRef(); 
 
   let navLinks = [
-    { id: "mission", title: "Mission" },
+    // { id: "mission", title: "Mission" },
     { id: "services", title: "Services" },
   ];
   const handleClickOutside = (event) => {
