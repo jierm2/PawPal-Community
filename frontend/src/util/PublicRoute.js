@@ -1,16 +1,20 @@
 import React from 'react';
-import { Navigate } from 'react-router-dom';
 import { useAuth } from '../auth';
-function PublicRoute({ children }) {
-  const { currentUser } = useAuth();
+import { Navigate, useLocation } from 'react-router-dom';
 
-  if (currentUser) {
-    // If there is no user, redirect to login
+function PublicRoute({ children }) {
+  const { currentUser, loading } = useAuth();
+  const location = useLocation();
+
+  if (loading) {
+    return <div>Loading...</div>; // or return null to render nothing
+  }
+
+  if (currentUser && location.pathname !== '/settings') {
     return <Navigate to="/settings" />;
   }
 
   return children;
 }
+
 export default PublicRoute;
-
-

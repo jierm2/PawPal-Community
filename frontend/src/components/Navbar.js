@@ -1,232 +1,80 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from "react";
 import { Link } from 'react-router-dom';
-import { FaBars } from 'react-icons/fa';
-import styled, { keyframes } from 'styled-components';
+import styled from 'styled-components';
 import { useAuth } from '../auth';
-import { getAuth, signOut } from 'firebase/auth';
 
-const Nav = styled.nav`
-  // background: #000;
-  height: 80px;
-  display: flex;
-  justify-content: space-between;
-  padding: 0.5rem calc((100vw - 1200px) / 2);
-  z-index: 10;
-`;
-
-
-const BaseLink = styled(Link)`
-  color: #fff;
-  text-decoration: none;
-  display: block;
-  transition: color 0.3s ease;
+const TitleLink = styled(Link)`
+  font-family: 'Fredoka One', cursive;
+  font-size: 2rem; 
+  color: #FFBA33; 
 
   &:hover {
     color: #fdd835; 
-  }
-`;
-
-const NavLink = styled(BaseLink)`
-  display: flex;
-  align-items: center;
-  padding: 0 1rem;
-  height: 100%;
-  cursor: pointer;
-`;
-
-const Bars = styled(FaBars)`
-  display: none;
-  color: #fff;
-
-  @media screen and (max-width: 768px) {
-    display: block;
-    position: absolute;
-    top: 0;
-    right: 0;
-    transform: translate(-100%, 75%);
-    font-size: 1.8rem;
-    cursor: pointer;
-  }
-`;
-
-const NavMenu = styled.div`
-  display: flex;
-  align-items: center;
-  margin-right: -24px;
-
-  @media screen and (max-width: 768px) {
-    display: none;
-  }
-`;
-
-const NavBtn = styled.nav`
-  display: flex;
-  align-items: center;
-  margin-right: 24px;
-
-  @media screen and (max-width: 768px) {
-    display: none;
-  }
-`;
-
-const NavBtnLink = styled(Link)`
-  border-radius: 4px;
-  background: #FFBA33;
-  padding: 10px 22px;
-  color: #fff;
-  outline: none;
-  border: none;
-  cursor: pointer;
-  transition: all 0.2s ease-in-out;
-  text-decoration: none;
-
-  &:hover {
-    transition: all 0.2s ease-in-out;
-    background: #fff;
-    color: #010606;
-  }
-`;
-
-const slideDown = keyframes`
-  0% { transform: translateY(-100%); }
-  100% { transform: translateY(0); }
-`;
-
-const DropdownMenu = styled.div`
-  display: none;
-  background-color: #f9f9f9;
-  position: absolute;
-  top: 80px; // Adjusted to align with the Nav height
-  min-width: 160px;
-  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-  z-index: 1;
-  width: 100%;
-  text-align: center;
-
-  @media screen and (max-width: 768px) {
-    display: ${props => (props.isOpen ? 'block' : 'none')};
-    animation: ${slideDown} 0.3s ease-out;
-  }
-`;
-
-const DropdownItem = styled(BaseLink)`
-  color: black;
-  padding: 12px 16px;
-
-  &:hover {
-    background-color: #f1f1f1;
-  }
-`;
-const TitleLink = styled(NavLink)`
-  font-family: 'Fredoka One', cursive;
-  font-size: 2.5rem; // Adjust the size as needed
-  color: #FFBA33; // Your chosen color
-
-  &:hover {
-    color: #fdd835; // Color for hover state
     text-decoration: none;
   }
 `;
 
 const Navbar = () => {
-  const [isOpen, setIsOpen] = useState(false);
+  const [active, setActive] = useState("Home");
+  const [toggle, setToggle] = useState(false);
   const { currentUser } = useAuth();
+  const navRef = useRef(); 
 
-  const closeMenu = () => {
-    setIsOpen(false);
-  };
-  const handleLogout = async () => {
-    try {
-      await signOut(getAuth());
-    } catch (error) {
-      console.error("Error signing out: ", error);
+  let navLinks = [
+    { id: "mission", title: "Mission" },
+    { id: "services", title: "Services" },
+  ];
+  const handleClickOutside = (event) => {
+    if (navRef.current && !navRef.current.contains(event.target)) {
+      setToggle(false);
     }
   };
+  useEffect(() => {
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+  if (currentUser) {
+    navLinks = [...navLinks, 
+                { id: "search", title: "Forum" },
+                { id: "settings", title: "Settings" }];
+  } else {
+    navLinks = [...navLinks, 
+                { id: "sign-up", title: "Sign Up" },
+                { id: "login", title: "Login" }];
+  }
 
   return (
-    <>
-      <Nav>
-        <TitleLink to='/'>
-          Pawpalcommunity
-        </TitleLink>
-        <Bars onClick={() => setIsOpen(!isOpen)} />
-        <NavMenu>
-          <NavLink to='/mission' onClick={closeMenu}>
-            Our Mission
-          </NavLink>
-          <NavLink to='/services' onClick={closeMenu}>
-            Services
-          </NavLink>
-
-          {!currentUser && (
-            <>
-
-              <NavLink to='/sign-up' onClick={closeMenu}>
-                Sign Up
-              </NavLink>
-            </>
-          )}
-{currentUser && (
-  <>         
-   <NavLink to='/search' onClick={closeMenu}>
-  Forum
-</NavLink>
- <NavLink to='/walker' onClick={closeMenu}>
-  Find a Walker
-</NavLink>
-
-      <NavLink to="/settings">
-      Settings
-    </NavLink>
-    <NavLink onClick={handleLogout}>
-      Logout
-    </NavLink>
-
-
-  </>
-)}
-
-        </NavMenu>
-        <DropdownMenu isOpen={isOpen}>
-          <DropdownItem to='/mission' onClick={closeMenu}>
-            Our Mission
-          </DropdownItem>
-          <DropdownItem to='/services' onClick={closeMenu}>
-            Services
-          </DropdownItem>
-
-          {!currentUser && (
-            <>
-              <DropdownItem to='/login' onClick={closeMenu}>
-                Login
-              </DropdownItem>
-              <DropdownItem to='/sign-up' onClick={closeMenu}>
-                Sign Up
-              </DropdownItem>
-            </>
-          )}
-          {currentUser && (
-            <>
-                                  <DropdownItem to='/search' onClick={closeMenu}>
-            Forum
-          </DropdownItem>
-                      <DropdownItem to='/walker' onClick={closeMenu}>
-            Become a Walker
-          </DropdownItem>
-          <DropdownItem onClick={handleLogout}>
-              Logout
-            </DropdownItem>
-          </>
-
-          )}
-        </DropdownMenu>
-        {!currentUser && (
-          <NavBtn>
-            <NavBtnLink to='/login'>Login</NavBtnLink>
-          </NavBtn>
-        )}
-      </Nav>
-    </>
+    <nav className="w-full flex py-3 justify-between items-center navbar" ref={navRef}>
+      <TitleLink to='/'>Pawpalcommunity</TitleLink>
+      <ul className="list-none sm:flex hidden justify-end items-center flex-1">
+        {navLinks.map((nav, index) => (
+          <li key={nav.id} className={`font-poppins font-normal cursor-pointer text-[16px] ${active === nav.title ? "text-white" : "text-dimWhite"} ${index === navLinks.length - 1 ? "mr-0" : "mr-10"}`}
+              onClick={() => setActive(nav.title)}>
+            <Link to={`/${nav.id}`}>{nav.title}</Link>
+          </li>
+        ))}
+      </ul>
+      <div className="sm:hidden flex flex-1 justify-end items-center">
+        <img
+          alt="menu"
+          className="w-[28px] h-[28px] object-contain"
+          onClick={() => setToggle(!toggle)}
+          src ="https://static.vecteezy.com/system/resources/previews/021/190/402/original/hamburger-menu-filled-icon-in-transparent-background-basic-app-and-web-ui-bold-line-icon-eps10-free-vector.jpg"
+        />
+        <div className={`${!toggle ? "hidden" : "flex"} p-6 bg-black-gradient absolute top-20 right-0 mx-4 my-2 min-w-[140px] rounded-xl sidebar`}>
+          <ul className="list-none flex justify-end items-start flex-1 flex-col">
+            {navLinks.map((nav, index) => (
+              <li key={nav.id} className={`font-poppins font-medium cursor-pointer text-[16px] ${active === nav.title ? "text-white" : "text-dimWhite"} ${index === navLinks.length - 1 ? "mb-0" : "mb-4"}`}
+                  onClick={() => setActive(nav.title)}>
+                <Link to={`/${nav.id}`}>{nav.title}</Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+    </nav>
   );
 };
 

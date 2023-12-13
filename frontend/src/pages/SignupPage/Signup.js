@@ -3,8 +3,8 @@ import { useNavigate } from "react-router-dom";
 import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
-import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import { getAuth, createUserWithEmailAndPassword,signOut } from "firebase/auth";
 
 const theme = createTheme({
   palette: {
@@ -45,25 +45,46 @@ function Signup() {
   const [Name, setName] = useState("");
   const [error, setError] = useState("");
   const [isSuccess, setIsSuccess] = useState(false); // New state for success animation
-  const signUp = async(e) => {
+  const signUp = async (e) => {
     e.preventDefault();
     setError('');
-    setIsSuccess(false); // Reset success state on new submission
-
+    setIsSuccess(false);
+  
+    if (!email || !password) {
+      setError('Please enter both email and password.');
+      return;
+    }
+  
     const auth = getAuth();
+  
     try {
-      createUserWithEmailAndPassword(auth, email, password)
-
+      // Step 1: Create user in Firebase
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      
+      // Step 2: Sign out the user immediately
+      await signOut(auth);
+  
+      // Step 3: Attempt to save data to MongoDB
       const response = await fetch('http://localhost:9001/api/users', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({name: Name,email:email,}),
+        body: JSON.stringify({ name: Name, email: email }),
       });
+  
+      if (!response.ok) {
+        throw new Error('Failed to save user data to MongoDB');
+      }
+  
+      setIsSuccess(true); 
+      
+  
       setIsSuccess(true); // Set success state to true
       setTimeout(() => navigate('/login'), 2000); // Redirect after 2 seconds
-      console.log(response)
     } catch (error) {
-      console.log("we have an error", error)
+      console.error("Error: ", error.code);
+      // console.error("Error: ", error.message);
+
+      setError(error.message);
       const errorCode = error.code;
       const errorMessage = error.message;
 
@@ -71,14 +92,15 @@ function Signup() {
         setError('Email already in use. Please try another.');
       } else if (errorCode === 'auth/invalid-email') {
         setError('Invalid email format. Please check your email.');
+      } else if (errorCode ==='auth/weak-password') {
+        setError('Password should be at least 6 characters');
       } else {
         setError(errorMessage);
       }
     }
-    
-
-      
   };
+  
+   
 
 
   return (
@@ -100,6 +122,7 @@ function Signup() {
                 margin="normal"
                 style={{ flex: 1, marginRight: "8px" }}
                 onChange={(e) => setName(e.target.value)}
+                required
               />
 
             </div>

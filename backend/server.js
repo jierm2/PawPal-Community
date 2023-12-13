@@ -434,14 +434,16 @@ app.put("/api/tasks/:id", async (req, res) => {
         });
         return;
       }
-      if (taskData.pendingWalkers === undefined || taskData.pendingWalkers.length !== 0) {
-        res.status(404).send({
-          message: "Task assignments must remove all pendingWalkers",
-          data: "Task assignments must remove all pendingWalkers" 
-        });
-        return;
-      }
+      // if (taskData.pendingWalkers !== undefined && taskData.pendingWalkers.length !== 0) {
+      //   console.log(taskData.pendingWalkers.length);
+      //   res.status(400).send({
+      //     message: "Task assignments must remove all pendingWalkers",
+      //     data: "Task assignments must remove all pendingWalkers" 
+      //   });
+      //   return;
+      // }
     }
+    
 
     const updatedTask = await Task.findOneAndUpdate({_id: task._id}, taskData);
 
