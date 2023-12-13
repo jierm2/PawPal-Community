@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Button, TextField, Snackbar, ThemeProvider, createTheme, CssBaseline } from '@mui/material';
 import MuiAlert from '@mui/material/Alert';
-import { EmailAuthProvider, reauthenticateWithCredential } from "firebase/auth";
+import { EmailAuthProvider, reauthenticateWithCredential, } from "firebase/auth";
 import { useAuth } from '../../auth';
-import { getAuth, updatePassword } from "firebase/auth";
+import { getAuth, updatePassword,signOut } from "firebase/auth";
+import { useNavigate } from 'react-router-dom';
+
 const Alert = React.forwardRef(function Alert(props, ref) {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
 });
@@ -44,6 +46,18 @@ function Settings() {
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'info' });
   const [currentPassword, setCurrentPassword] = useState("");
   const { currentUser, mongoDBUser } = useAuth();
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(true); // New loading state
+
+  const handleLogout = async () => {
+    try {
+      await signOut(getAuth());
+      navigate('/login');
+    } catch (error) {
+      console.error("Error signing out: ", error);
+    }
+  };
+  
 
   const auth = getAuth();
   useEffect(() => {
@@ -51,11 +65,22 @@ function Settings() {
     if (user) {
       setUserEmail(user.email || "");
     }
-  }, []);
-  if (!mongoDBUser) {
-    return <div>Loading...</div>; // or handle the loading state as you prefer
+
+    if (mongoDBUser) {
+      setLoading(false); // Set loading to false when mongoDBUser is available
+      console.log('MongoDB user data ava')
+    } else {
+      console.log("Waiting for MongoDB user data...");
+      
+    }
+  }, [mongoDBUser]);
+
+  if (loading) {
+    return <div style={{ color: 'white' }}>Loading user data...</div>; // Display a loading message or spinner with white text
   }
-  const userName = mongoDBUser.name; 
+  
+
+  const userName = mongoDBUser && mongoDBUser.name ? mongoDBUser.name : '';
 
   const reauthenticate = async (currentPassword) => {
     const user = auth.currentUser;
@@ -165,6 +190,13 @@ function Settings() {
           />
 
           <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 16 }}>
+          <Button 
+              variant="contained" 
+              color="error" 
+              onClick={handleLogout}
+            >
+              Log Out
+            </Button>
             <Button 
               variant="contained" 
               color="primary" 
