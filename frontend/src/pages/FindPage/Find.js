@@ -232,7 +232,7 @@ function Find() {
     const updatedPendingWalkers = taskToApply ? 
       [...(taskToApply.pendingWalkers || []), mongoDBUser._id] : [mongoDBUser._id];
   
-    fetch(`http://localhost:9001/api/tasks/${taskId}`, {
+    fetch(`/api/tasks/${taskId}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
